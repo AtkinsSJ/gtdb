@@ -16,7 +16,11 @@
 	<section id="itemInfoBoxes"></section>
 
 	<script type="text/javascript">
+
+		var debugMode = true; // Enables various tests to check everything is valid. Can be disabled in release mode.
+
 		// NB: These are in any old order, we sort them later so they appear alphabetically.
+		// But I'm starting off with SEEDIARY's info, so these are in the order they appear there!
 		var items = {
 			"Dirt": {rarity: 1, spawnsInWorld: "normal"},
 			"Cave Background": {rarity: 1, spawnsInWorld: "normal"},
@@ -40,7 +44,7 @@
 			"Daisy": {rarity: 3, splice: ["Grass", "Dirt"]},
 			"Rose": {rarity: 3, splice: ["Grass", "Lava"]},
 			"Mushroom": {rarity: 3, splice: ["Grass", "Cave Background"]},
-			"Brick": {rarity: 3, splice: ["Grass", "Rock"]},
+			"Bricks": {rarity: 3, splice: ["Grass", "Rock"]},
 			"Rock Background": {rarity: 3, splice: ["Door", "Rock"]},
 			"Wooden Background": {rarity: 4, splice: ["Door", "Grass"]},
 			"Wooden Platform": {rarity: 4, splice: ["Wood Block", "Grass"]},
@@ -52,6 +56,25 @@
 			"Cargo Shorts": {rarity: 3, splice: ["Wood Block", "Dirt"]},
 			"Torch": {rarity: 3, splice: ["Sign", "Lava"]},
 			"Wheat": {rarity: 3, splice: ["Grass", "Sand"]},
+
+			"Poppy": {rarity: 6, splice: ["Daisy", "Rose"]},
+			"Brown Block": {rarity: 4, splice: ["Bricks", "Dirt"]},
+			"Black Block": {rarity: 4, splice: ["Bricks", "Cave Background"]},
+			"Grey Block": {rarity: 4, splice: ["Bricks", "Rock"]},
+			"Red Block": {rarity: 4, splice: ["Bricks", "Lava"]},
+			"Green Block": {rarity: 5, splice: ["Bricks", "Grass"]},
+			"Yellow Block": {rarity: 6, splice: ["Bricks", "Daisy"]},
+			"Aqua Block": {rarity: 5, splice: ["Bricks", "Glass Pane"]},
+			"White Block": {rarity: 6, splice: ["Bricks", "Mushroom"]},
+			"Danger Sign": {rarity: 5, splice: ["Pointy Sign", "Lava"]},
+			"Wooden Table": {rarity: 6, splice: ["Wooden Platform", "Wood Block"]},
+			"Window": {rarity: 6, splice: ["Wooden Background", "Glass Pane"]},
+			"Flowery Wallpaper": {rarity: 7, splice: ["Wooden Background", "Daisy"]},
+			"Mud Glob": {rarity: 4, splice: ["Daisy", "Dirt"]},
+			"Tan Shirt": {rarity: 4, splice: ["Rock Background", "Dirt"]},
+			"Stinky Socks": {rarity: 4, splice: ["Mushroom", "Dirt"]},
+			"Shallot Mustache": {rarity: 5, splice: ["Mushroom", "Grass"]},
+			"Messy Brown Hair": {rarity: 5, splice: ["Crappy Sign", "Grass"]},
 		};
 
 		function makeLinkID(name) {
@@ -158,6 +181,29 @@
 				}
 
 				itemInfoBoxes.appendChild(infoBox);
+			}
+
+			if (debugMode) {
+				if (item.splice) {
+					// Check splicing parent names
+					var parent1 = items[item.splice[0]];
+					var parent2 = items[item.splice[1]];
+
+					if (!parent1) {
+						console.error("Item", itemName, "parent item not found: ", item.splice[0]);
+						continue;
+					}
+					if (!parent2) {
+						console.error("Item", itemName, "parent item not found: ", item.splice[1]);
+						continue;
+					}
+
+					// Check the rarities match!
+					var targetRarity = parent1.rarity + parent2.rarity;
+					if (item.rarity != targetRarity) {
+						console.error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
+					}
+				}
 			}
 		}
 
