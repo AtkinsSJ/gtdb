@@ -6,6 +6,7 @@ TODO:
 
 - Make things look nice
 	- Images
+	- Current colours are the WORST.
 
 - Enter everything! UGH
 
