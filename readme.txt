@@ -8,3 +8,5 @@ TODO:
 	- Images
 
 - Enter everything! UGH
+
+- Have items spawned in a world link to their blast

@@ -165,6 +165,18 @@
 			// Item of the Month
 			"Golden Razor Wings": {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}},
 
+			// Weather Machines
+			"Weather Machine - Sunny": {store: {section: "Weather Machines", cost: 1000}},
+			"Weather Machine - Night": {store: {section: "Weather Machines", cost: 10000}},
+			"Weather Machine - Arid": {store: {section: "Weather Machines", cost: 10000}},
+			"Weather Machine - Rainy City": {store: {section: "Weather Machines", cost: 10000}},
+			"Weather Machine - Warp Speed": {store: {section: "Weather Machines", cost: 10000}},
+			"Mars Blast": {store: {section: "Weather Machines", cost: 15000}},
+			"Thermonuclear Blast": {store: {section: "Weather Machines", cost: 15000}},
+			"Undersea Blast": {store: {section: "Weather Machines", cost: 15000}},
+			"Cave Blast": {store: {section: "Weather Machines", cost: 30000}},
+			"Weather Machine - Stuff": {store: {section: "Weather Machines", cost: 50000}},
+
 			// Growtokens
 			"Challenge Timer": {tokenStore: 5},
 			"Experience Potion": {tokenStore: 10},
@@ -268,6 +280,9 @@
 				}
 				if (item.itemOfTheMonth) {
 					sourceInfo.push("Was the <a href=\"https://growtopiagame.com/itemomonth.php\" target=\"_blank\">Item of the Month</a> in " + item.itemOfTheMonth.month + " " + item.itemOfTheMonth.year + ", available in the Store for " + item.itemOfTheMonth.cost + " gems.");
+				}
+				if (item.store) {
+					sourceInfo.push("Available in the Store for " + item.store.cost + " gems, in the " + item.store.section + " section.");
 				}
 				if (item.tokenStore) {
 					sourceInfo.push("Available in the Store for " + item.tokenStore + " Growtokens.");
