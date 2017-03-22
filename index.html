@@ -16,6 +16,7 @@
 	<section id="itemInfoBoxes"></section>
 
 	<script type="text/javascript">
+		// NB: These are in any old order, we sort them later so they appear alphabetically.
 		var items = {
 			"Dirt": {rarity: 1, spawnsInWorld: "normal"},
 			"Cave Background": {rarity: 1, spawnsInWorld: "normal"},
@@ -78,8 +79,10 @@
 
 		var itemInfoBoxes = document.getElementById("itemInfoBoxes");
 		var allNames = Object.keys(items);
-		for (var itemName in items) {
-			if (!items.hasOwnProperty(itemName)) continue;
+		allNames.sort();
+
+		for (var itemIndex in allNames) {
+			var itemName = allNames[itemIndex];
 
 			var item = items[itemName];
 			var anchorName = makeLinkID(itemName);
@@ -149,7 +152,6 @@
 		}
 
 		var itemsList = document.getElementById("itemsList");
-		allNames.sort();
 		for (var i = 0; i < allNames.length; i++) {
 			var a = document.createElement("a");
 			a.href = "#" + makeLinkID(allNames[i]);
