@@ -22,7 +22,7 @@
 		// NB: These are in any old order, we sort them later so they appear alphabetically.
 		// But I'm starting off with SEEDIARY's info, so these are in the order they appear there!
 		var items = {
-			// Gen I
+			// GEN I
 			"Dirt": {rarity: 1, spawnsInWorld: "normal"},
 			"Cave Background": {rarity: 1, spawnsInWorld: "normal"},
 			"Rock": {rarity: 1, spawnsInWorld: "normal"},
@@ -227,15 +227,22 @@
 				infoBox.appendChild(rarity);
 
 				var source = document.createElement("p");
+				var sourceInfo = [];
 				if (item.splice) {
-					source.innerHTML = "Plant a " + itemName + " seed, or splice a "
+					sourceInfo.push("Plant a " + itemName + " seed, or splice a "
 					+ "<a href=\"#" + makeLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
-					+ "<a href=\"#" + makeLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.";
-				} else if (item.spawnsInWorld) {
-					source.innerText = "Spawns naturally in new " + item.spawnsInWorld + " worlds."
-				} else if (item.spawnsInEvent) {
-					source.innerHTML = "Spawns in the '" + item.spawnsInEvent + "' special event."
+					+ "<a href=\"#" + makeLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.");
 				}
+				if (item.spawnsInWorld) {
+					sourceInfo.push("Spawns naturally in new " + item.spawnsInWorld + " worlds.");
+				}
+				if (item.spawnsInEvent) {
+					sourceInfo.push("Spawns in the '" + item.spawnsInEvent + "' special event.");
+				}
+				if (item.rareWhenHarvesting) {
+					sourceInfo.push("Is a rare drop when harvesting <a href=\"#" + makeLinkID(item.rareWhenHarvesting) + "\">" + item.rareWhenHarvesting + "</a> trees.");
+				}
+				source.innerHTML = sourceInfo.join("<br/>");
 				infoBox.appendChild(source);
 
 				var wikiLink = document.createElement("a");
