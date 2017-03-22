@@ -77,15 +77,25 @@
 			return children;
 		}
 
+		var itemsList = document.getElementById("itemsList");
 		var itemInfoBoxes = document.getElementById("itemInfoBoxes");
 		var allNames = Object.keys(items);
 		allNames.sort();
 
 		for (var itemIndex in allNames) {
 			var itemName = allNames[itemIndex];
-
 			var item = items[itemName];
 			var anchorName = makeLinkID(itemName);
+
+			// TOC
+			{
+				var a = document.createElement("a");
+				a.href = "#" + anchorName;
+				a.innerText = itemName;
+				var li = document.createElement("li");
+				li.appendChild(a);
+				itemsList.appendChild(li);
+			}
 
 			// Info box
 			{
@@ -149,16 +159,6 @@
 
 				itemInfoBoxes.appendChild(infoBox);
 			}
-		}
-
-		var itemsList = document.getElementById("itemsList");
-		for (var i = 0; i < allNames.length; i++) {
-			var a = document.createElement("a");
-			a.href = "#" + makeLinkID(allNames[i]);
-			a.innerText = allNames[i];
-			var li = document.createElement("li");
-			li.appendChild(a);
-			itemsList.appendChild(li);
 		}
 
 	</script>
