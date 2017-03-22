@@ -38,7 +38,7 @@
 			{name: "Cave Background", rarity: 1, spawnsInWorld: "normal"},
 			{name: "Rock", rarity: 1, spawnsInWorld: "normal"},
 			{name: "Lava", rarity: 1, spawnsInWorld: "normal"},
-			{name: "Crystal Block", rarity: 1},
+			{name: "Crystal Block", rarity: 100, spawnsInEvent: "Beautiful Crystal"},
 			{name: "Sand", rarity: 1, spawnsInWorld: "Beach Blast"},
 			{name: "Ocean Rock", rarity: 1, spawnsInWorld: "Beach Blast"},
 			{name: "Garbage", rarity: 1},
@@ -57,6 +57,11 @@
 		function makeLinkID(name) {
 			var regex = /\s/g;
 			return name.replace(regex, "_");
+		}
+
+		function makeWikiLink(itemName) {
+			var regex = /\s/g;
+			return "http://growtopia.wikia.com/wiki/" + itemName.replace(regex, "_");
 		}
 
 		var itemsList = document.getElementById("itemsList");
@@ -82,12 +87,17 @@
 
 				var img = document.createElement("img");
 				var itemName = document.createElement("h2");
-				itemName.innerText = item.name + " (Rarity: " + item.rarity + ")";
+				itemName.innerText = item.name;
 				var anchor = document.createElement("a");
 				anchor.id = anchorName;
+				anchor.href = "#" + anchorName;
 				anchor.appendChild(img);
 				anchor.appendChild(itemName);
 				infoBox.appendChild(anchor);
+
+				var rarity = document.createElement("div");
+				rarity.innerText = "Rarity: " + item.rarity;
+				infoBox.appendChild(rarity);
 
 				var source = document.createElement("p");
 				if (item.splice) {
@@ -96,8 +106,16 @@
 					+ "<a href=\"#" + makeLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.";
 				} else if (item.spawnsInWorld) {
 					source.innerText = "Spawns naturally in new " + item.spawnsInWorld + " worlds."
+				} else if (item.spawnsInEvent) {
+					source.innerHTML = "Spawns in the '" + item.spawnsInEvent + "' special event."
 				}
 				infoBox.appendChild(source);
+
+				var wikiLink = document.createElement("a");
+				wikiLink.href = makeWikiLink(item.name);
+				wikiLink.target = "_blank";
+				wikiLink.innerText = "View on Growtopia Wiki";
+				infoBox.appendChild(wikiLink);
 
 				itemInfoBoxes.appendChild(infoBox);
 			}
