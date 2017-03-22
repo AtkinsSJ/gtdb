@@ -33,26 +33,42 @@
 	</div>
 
 	<script type="text/javascript">
-		var items = [
-			{name: "Dirt", rarity: 1, spawnsInWorld: "normal"},
-			{name: "Cave Background", rarity: 1, spawnsInWorld: "normal"},
-			{name: "Rock", rarity: 1, spawnsInWorld: "normal"},
-			{name: "Lava", rarity: 1, spawnsInWorld: "normal"},
-			{name: "Crystal Block", rarity: 100, spawnsInEvent: "Beautiful Crystal"},
-			{name: "Sand", rarity: 1, spawnsInWorld: "Beach Blast"},
-			{name: "Ocean Rock", rarity: 1, spawnsInWorld: "Beach Blast"},
-			{name: "Garbage", rarity: 1},
-			{name: "Sandstone Wall", rarity: 1, spawnsInWorld: "Desert Blast"},
-			{name: "Boulder", rarity: 1, spawnsInWorld: "Desert Blast"},
-			{name: "Obelisk", rarity: 1, spawnsInWorld: "Desert Blast"},
+		var items = {
+			"Dirt": {rarity: 1, spawnsInWorld: "normal"},
+			"Cave Background": {rarity: 1, spawnsInWorld: "normal"},
+			"Rock": {rarity: 1, spawnsInWorld: "normal"},
+			"Lava": {rarity: 1, spawnsInWorld: "normal"},
+			"Crystal Block": {rarity: 100, spawnsInEvent: "Beautiful Crystal"},
+			"Sand": {rarity: 1, spawnsInWorld: "Beach Blast"},
+			"Ocean Rock": {rarity: 1, spawnsInWorld: "Beach Blast"},
+			"Garbage": {rarity: 1},
+			"Sandstone Wall": {rarity: 1, spawnsInWorld: "Desert Blast"},
+			"Boulder": {rarity: 1, spawnsInWorld: "Desert Blast"},
+			"Obelisk": {rarity: 30, spawnsInWorld: "Desert Blast"},
 
-			{name: "Door", rarity: 2, splice: ["Dirt", "Cave Background"]},
-			{name: "Sign", rarity: 2, splice: ["Rock", "Cave Background"]},
-			{name: "Grass", rarity: 2, splice: ["Rock", "Dirt"]},
-			{name: "Wood Block", rarity: 2, splice: ["Dirt", "Lava"]},
-			{name: "Glass Pane", rarity: 2, splice: ["Rock", "Lava"]},
-			{name: "Lava Rock", rarity: 2, splice: ["Cave Background", "Lava"]},
-		];
+			"Door": {rarity: 2, splice: ["Dirt", "Cave Background"]},
+			"Sign": {rarity: 2, splice: ["Rock", "Cave Background"]},
+			"Grass": {rarity: 2, splice: ["Rock", "Dirt"]},
+			"Wood Block": {rarity: 2, splice: ["Dirt", "Lava"]},
+			"Glass Pane": {rarity: 2, splice: ["Rock", "Lava"]},
+			"Lava Rock": {rarity: 2, splice: ["Cave Background", "Lava"]},
+
+			"Daisy": {rarity: 3, splice: ["Grass", "Dirt"]},
+			"Rose": {rarity: 3, splice: ["Grass", "Lava"]},
+			"Mushroom": {rarity: 3, splice: ["Grass", "Cave Background"]},
+			"Brick": {rarity: 3, splice: ["Grass", "Rock"]},
+			"Rock Background": {rarity: 3, splice: ["Door", "Rock"]},
+			"Wooden Background": {rarity: 4, splice: ["Door", "Grass"]},
+			"Wooden Platform": {rarity: 4, splice: ["Wood Block", "Grass"]},
+			"Crappy Sign": {rarity: 3, splice: ["Door", "Dirt"]},
+			"Pointy Sign": {rarity: 4, splice: ["Door", "Sign"]},
+			"Super Crate Box": {rarity: 3, splice: ["Sign", "Dirt"]},
+			"Amber Glass": {rarity: 3, splice: ["Glass Pane", "Dirt"]},
+			"Happy Joy Plaque": {rarity: 3, splice: ["Door", "Cave Background"]},
+			"Cargo Shorts": {rarity: 3, splice: ["Wood Block", "Dirt"]},
+			"Torch": {rarity: 3, splice: ["Sign", "Lava"]},
+			"Wheat": {rarity: 3, splice: ["Grass", "Sand"]},
+		};
 
 		function makeLinkID(name) {
 			var regex = /\s/g;
@@ -64,21 +80,13 @@
 			return "http://growtopia.wikia.com/wiki/" + itemName.replace(regex, "_");
 		}
 
-		var itemsList = document.getElementById("itemsList");
 		var itemInfoBoxes = document.getElementById("itemInfoBoxes");
-		for (var i = 0; i < items.length; i++) {
-			var item = items[i];
-			var anchorName = makeLinkID(item.name);
+		var allNames = Object.keys(items);
+		for (var itemName in items) {
+			if (!items.hasOwnProperty(itemName)) continue;
 
-			// TOC
-			{
-				var a = document.createElement("a");
-				a.href = "#" + anchorName;
-				a.innerText = item.name;
-				var li = document.createElement("li");
-				li.appendChild(a);
-				itemsList.appendChild(li);
-			}
+			var item = items[itemName];
+			var anchorName = makeLinkID(itemName);
 
 			// Info box
 			{
@@ -86,13 +94,13 @@
 				infoBox.class = "itemInfoBox";
 
 				var img = document.createElement("img");
-				var itemName = document.createElement("h2");
-				itemName.innerText = item.name;
+				var itemHeading = document.createElement("h2");
+				itemHeading.innerText = itemName;
 				var anchor = document.createElement("a");
 				anchor.id = anchorName;
 				anchor.href = "#" + anchorName;
 				anchor.appendChild(img);
-				anchor.appendChild(itemName);
+				anchor.appendChild(itemHeading);
 				infoBox.appendChild(anchor);
 
 				var rarity = document.createElement("div");
@@ -101,7 +109,7 @@
 
 				var source = document.createElement("p");
 				if (item.splice) {
-					source.innerHTML = "Plant a " + item.name + " seed, or splice a "
+					source.innerHTML = "Plant a " + itemName + " seed, or splice a "
 					+ "<a href=\"#" + makeLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
 					+ "<a href=\"#" + makeLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.";
 				} else if (item.spawnsInWorld) {
@@ -112,7 +120,7 @@
 				infoBox.appendChild(source);
 
 				var wikiLink = document.createElement("a");
-				wikiLink.href = makeWikiLink(item.name);
+				wikiLink.href = makeWikiLink(itemName);
 				wikiLink.target = "_blank";
 				wikiLink.innerText = "View on Growtopia Wiki";
 				infoBox.appendChild(wikiLink);
@@ -120,6 +128,18 @@
 				itemInfoBoxes.appendChild(infoBox);
 			}
 		}
+
+		var itemsList = document.getElementById("itemsList");
+		allNames.sort();
+		for (var i = 0; i < allNames.length; i++) {
+			var a = document.createElement("a");
+			a.href = "#" + makeLinkID(allNames[i]);
+			a.innerText = allNames[i];
+			var li = document.createElement("li");
+			li.appendChild(a);
+			itemsList.appendChild(li);
+		}
+
 	</script>
 </body>
 </html>
