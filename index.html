@@ -10,27 +10,10 @@
 
 	<nav class="tableOfContents">
 		<h2>All items</h2>
-		<ul id="itemsList">
-		</ul>
+		<ul id="itemsList"></ul>
 	</nav>
 
-	<section id="itemInfoBoxes">
-		
-	</section>
-
-	<div class="itemInfoBox">
-		<a id="Dirt">
-			<img />
-			<h2>Dirt</h2>
-		</a>
-		<p>Spawns naturally in normal worlds.</p>
-		<h3>Used to make:</h3>
-		<ul>
-			<li><a href="#Door">Door</a></li>
-			<li><a href="#Grass">Grass</a></li>
-			<li><a href="#Wood_Block">Wood Block</a></li>
-		</ul>
-	</div>
+	<section id="itemInfoBoxes"></section>
 
 	<script type="text/javascript">
 		var items = {
@@ -80,6 +63,19 @@
 			return "http://growtopia.wikia.com/wiki/" + itemName.replace(regex, "_");
 		}
 
+		function findAllChildItems(parentItem, items) {
+			var children = [];
+
+			for (var itemName in items) {
+				if (!items.hasOwnProperty(itemName)) continue;
+
+				var item = items[itemName];
+				if (item.splice && item.splice.includes(parentItem)) children.push(itemName);
+			}
+
+			return children;
+		}
+
 		var itemInfoBoxes = document.getElementById("itemInfoBoxes");
 		var allNames = Object.keys(items);
 		for (var itemName in items) {
@@ -124,6 +120,29 @@
 				wikiLink.target = "_blank";
 				wikiLink.innerText = "View on Growtopia Wiki";
 				infoBox.appendChild(wikiLink);
+
+				// Where is this used?
+				// This is a really really dumb check right now.
+				// Probably makes more sense to put everything in a DB on a server rather than here, but oh well.
+				var childItems = findAllChildItems(itemName, items);
+				if (childItems.length > 0) {
+					var usedToMake = document.createElement("h3");
+					usedToMake.innerText = "Used to make:";
+					infoBox.appendChild(usedToMake);
+					var usedToMakeList = document.createElement("ul");
+					for (var i = 0; i < childItems.length; i++) {
+						var childName = childItems[i];
+
+						var a = document.createElement("a");
+						a.href = "#" + makeLinkID(childName);
+						a.innerText = childName;
+						var li = document.createElement("li");
+						li.appendChild(a);
+						usedToMakeList.appendChild(li);
+					}
+
+					infoBox.appendChild(usedToMakeList);
+				}
 
 				itemInfoBoxes.appendChild(infoBox);
 			}
