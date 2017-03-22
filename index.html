@@ -161,7 +161,8 @@
 			"Water Bucket": {rarity: 12, splice: ["Toilet", "Aqua Block"]},
 			"White Beard": {rarity: 15, splice: ["Bush", "White Block"]},
 			"Wooden Chair": {rarity: 11, splice: ["Toilet", "Wooden Platform"]},
-			
+		
+			"Golden Razor Wings": {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}},
 		};
 
 		function makeLinkID(name) {
@@ -222,9 +223,11 @@
 				anchor.appendChild(itemHeading);
 				infoBox.appendChild(anchor);
 
-				var rarity = document.createElement("div");
-				rarity.innerText = "Rarity: " + item.rarity;
-				infoBox.appendChild(rarity);
+				if (item.rarity) {
+					var rarity = document.createElement("div");
+					rarity.innerText = "Rarity: " + item.rarity;
+					infoBox.appendChild(rarity);
+				}
 
 				var source = document.createElement("p");
 				var sourceInfo = [];
@@ -241,6 +244,9 @@
 				}
 				if (item.rareWhenHarvesting) {
 					sourceInfo.push("Is a rare drop when harvesting <a href=\"#" + makeLinkID(item.rareWhenHarvesting) + "\">" + item.rareWhenHarvesting + "</a> trees.");
+				}
+				if (item.itemOfTheMonth) {
+					sourceInfo.push("Was the <a href=\"https://growtopiagame.com/itemomonth.php\" target=\"_blank\">Item of the Month</a> in " + item.itemOfTheMonth.month + " " + item.itemOfTheMonth.year + ", available in the store for " + item.itemOfTheMonth.cost + " gems.");
 				}
 				source.innerHTML = sourceInfo.join("<br/>");
 				infoBox.appendChild(source);
