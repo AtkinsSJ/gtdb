@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8" />
 	<title>Growtopia Item Database</title>
 </head>
+
 <body>
 	<h1>Growtopia Item Database</h1>
-	<ul id="itemsList">
-	</ul>
 
-	<div class="itemInfo">
+	<nav class="tableOfContents">
+		<h2>All items</h2>
+		<ul id="itemsList">
+		</ul>
+	</nav>
+
+	<section id="itemInfoBoxes">
+		
+	</section>
+
+	<div class="itemInfoBox">
 		<a id="Dirt">
 			<img />
 			<h2>Dirt</h2>
@@ -24,30 +34,73 @@
 
 	<script type="text/javascript">
 		var items = [
-			{name: "Dirt"},
-			{name: "Cave Background"},
-			{name: "Rock"},
-			{name: "Lava"},
-			{name: "Crystal Block"},
-			{name: "Sand"},
-			{name: "Ocean Rock"},
-			{name: "Garbage"},
-			{name: "Sandstone Wall"},
-			{name: "Boulder"},
-			{name: "Obelisk"},
+			{name: "Dirt", rarity: 1, spawnsInWorld: "normal"},
+			{name: "Cave Background", rarity: 1, spawnsInWorld: "normal"},
+			{name: "Rock", rarity: 1, spawnsInWorld: "normal"},
+			{name: "Lava", rarity: 1, spawnsInWorld: "normal"},
+			{name: "Crystal Block", rarity: 1},
+			{name: "Sand", rarity: 1, spawnsInWorld: "Beach Blast"},
+			{name: "Ocean Rock", rarity: 1, spawnsInWorld: "Beach Blast"},
+			{name: "Garbage", rarity: 1},
+			{name: "Sandstone Wall", rarity: 1, spawnsInWorld: "Desert Blast"},
+			{name: "Boulder", rarity: 1, spawnsInWorld: "Desert Blast"},
+			{name: "Obelisk", rarity: 1, spawnsInWorld: "Desert Blast"},
 
-			{name: "Door", splice: ["Dirt", "Cave Background"]},
-			{name: "Sign", splice: ["Rock", "Cave Background"]},
-			{name: "Grass", splice: ["Rock", "Dirt"]},
-			{name: "Wood Block", splice: ["Dirt", "Lava"]},
-			{name: "Glass Pane", splice: ["Rock", "Lava"]},
-			{name: "Lava Rock", splice: ["Cave Background", "Lava"]},
+			{name: "Door", rarity: 2, splice: ["Dirt", "Cave Background"]},
+			{name: "Sign", rarity: 2, splice: ["Rock", "Cave Background"]},
+			{name: "Grass", rarity: 2, splice: ["Rock", "Dirt"]},
+			{name: "Wood Block", rarity: 2, splice: ["Dirt", "Lava"]},
+			{name: "Glass Pane", rarity: 2, splice: ["Rock", "Lava"]},
+			{name: "Lava Rock", rarity: 2, splice: ["Cave Background", "Lava"]},
 		];
 
-		var itemsList = document.getElementByID("itemsList");
+		function makeLinkID(name) {
+			var regex = /\s/g;
+			return name.replace(regex, "_");
+		}
+
+		var itemsList = document.getElementById("itemsList");
+		var itemInfoBoxes = document.getElementById("itemInfoBoxes");
 		for (var i = 0; i < items.length; i++) {
 			var item = items[i];
+			var anchorName = makeLinkID(item.name);
 
+			// TOC
+			{
+				var a = document.createElement("a");
+				a.href = "#" + anchorName;
+				a.innerText = item.name;
+				var li = document.createElement("li");
+				li.appendChild(a);
+				itemsList.appendChild(li);
+			}
+
+			// Info box
+			{
+				var infoBox = document.createElement("div");
+				infoBox.class = "itemInfoBox";
+
+				var img = document.createElement("img");
+				var itemName = document.createElement("h2");
+				itemName.innerText = item.name + " (Rarity: " + item.rarity + ")";
+				var anchor = document.createElement("a");
+				anchor.id = anchorName;
+				anchor.appendChild(img);
+				anchor.appendChild(itemName);
+				infoBox.appendChild(anchor);
+
+				var source = document.createElement("p");
+				if (item.splice) {
+					source.innerHTML = "Plant a " + item.name + " seed, or splice a "
+					+ "<a href=\"#" + makeLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
+					+ "<a href=\"#" + makeLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.";
+				} else if (item.spawnsInWorld) {
+					source.innerText = "Spawns naturally in new " + item.spawnsInWorld + " worlds."
+				}
+				infoBox.appendChild(source);
+
+				itemInfoBoxes.appendChild(infoBox);
+			}
 		}
 	</script>
 </body>
