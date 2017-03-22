@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Growtopia Item Database</title>
+</head>
+<body>
+	<h1>Growtopia Item Database</h1>
+	<ul id="itemsList">
+	</ul>
+
+	<div class="itemInfo">
+		<a id="Dirt">
+			<img />
+			<h2>Dirt</h2>
+		</a>
+		<p>Spawns naturally in normal worlds.</p>
+		<h3>Used to make:</h3>
+		<ul>
+			<li><a href="#Door">Door</a></li>
+			<li><a href="#Grass">Grass</a></li>
+			<li><a href="#Wood_Block">Wood Block</a></li>
+		</ul>
+	</div>
+
+	<script type="text/javascript">
+		var items = [
+			{name: "Dirt"},
+			{name: "Cave Background"},
+			{name: "Rock"},
+			{name: "Lava"},
+			{name: "Crystal Block"},
+			{name: "Sand"},
+			{name: "Ocean Rock"},
+			{name: "Garbage"},
+			{name: "Sandstone Wall"},
+			{name: "Boulder"},
+			{name: "Obelisk"},
+
+			{name: "Door", splice: ["Dirt", "Cave Background"]},
+			{name: "Sign", splice: ["Rock", "Cave Background"]},
+			{name: "Grass", splice: ["Rock", "Dirt"]},
+			{name: "Wood Block", splice: ["Dirt", "Lava"]},
+			{name: "Glass Pane", splice: ["Rock", "Lava"]},
+			{name: "Lava Rock", splice: ["Cave Background", "Lava"]},
+		];
+
+		var itemsList = document.getElementByID("itemsList");
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+
+		}
+	</script>
+</body>
+</html>
