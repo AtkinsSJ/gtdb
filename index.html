@@ -776,6 +776,10 @@
 			"Golden Pickaxe": {tokenStore: 200},
 			"Puppy Leash": {tokenStore: 200},
 			"Digger's Spade": {tokenStore: 200},
+
+			// Special Prizes
+			"Growie Award": {competitionPrize: "Video of the Week", competitionURL: "https://www.growtopiagame.com/forums/showthread.php?77092-Nominate-Youtube-videos-for-Growies-here!"},
+			"Ultra Trophy 3000": {competitionPrize: "World of the Day", competitionURL: "https://www.growtopiagame.com/forums/showthread.php?353202-Is-your-world-good-enough-to-be-a-World-Of-The-Day-!"},
 		};
 
 		function makeItemLinkID(name) {
@@ -909,6 +913,10 @@
 				}
 				if (item.tokenStore) {
 					sourceInfo.push("Available in the Store for " + item.tokenStore + " Growtokens.");
+				}
+				if (item.competitionPrize) {
+					sourceInfo.push("Is a prize for winning " + item.competitionPrize
+						+ ". <a href=\"" + item.competitionURL + "\" target=\"_blank\">Enter here</a>");
 				}
 				source.innerHTML = sourceInfo.join("<br/>");
 				infoBox.appendChild(source);
