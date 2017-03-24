@@ -842,7 +842,7 @@
 			"Santa Hat": {rarity: 10, splice: ["White Block", "Red Block"]},
 			"Santa Vest": {rarity: 7, splice: ["White Block", "Lava"]},
 			"Santa Pants": {rarity: 5, splice: ["Grey Block", "Lava"]},
-			"Sheet Music: Blank": {rarity: 9, splice: ["White Block", "Super Crate Box"]},
+			"Sheet Music: Blank": {rarity: 9, splice: ["White Block", "Super Crate Box"], fromStorePack: "Composer's Pack"},
 			"Red Bricks": {rarity: 7, splice: ["Red Block", "Bricks"], fromStorePack: "Education Pack"},
 			"Pencil": {rarity: 8, splice: ["Yellow Block", "Wood Block"]},
 			"Worthless Rags": {rarity: 5, splice: ["Mud Glob", "Dirt"], fromStorePack: "Dungeon Pack"},
@@ -877,8 +877,8 @@
 			"Polka Dot Block": {rarity: 15, splice: ["Orange Block", "White Block"]},
 			"Portcullis": {rarity: 16, splice: ["Death Spikes", "Dungeon Door"], spriteIndex: 30},
 			"Red Coat": {rarity: 13, splice: ["Bush", "Red Block"]},
-			"Sheet Music: Drums": {rarity: 13, splice: ["Sheet Music: Blank", "Brown Block"]},
-			"Sheet Music: Piano Note": {rarity: 14, splice: ["Sheet Music: Blank", "Green Block"]},
+			"Sheet Music: Drums": {rarity: 13, splice: ["Sheet Music: Blank", "Brown Block"], fromStorePack: "Composer's Pack"},
+			"Sheet Music: Piano Note": {rarity: 14, splice: ["Sheet Music: Blank", "Green Block"], fromStorePack: "Composer's Pack"},
 			"Sidewalk": {rarity: 11, splice: ["Red Bricks", "Grey Block"]},
 			"Spikey Hair": {rarity: 14, splice: ["Death Spikes", "Yellow Block"]},
 			"Sword": {rarity: 11, splice: ["Death Spikes", "Rock Background"]},
@@ -889,11 +889,11 @@
 			"Wooden Chair": {rarity: 11, splice: ["Toilet", "Wooden Platform"]},
 			// GEN VII
 			"Ancient Stone Gate": {rarity: 17, splice: ["Portcullis", "Sandstone Wall"]},
-			"Apple": {rarity: 11, splice: ["Blueberry", "Red Bricks"]},
+			"Apple": {rarity: 11, splice: ["Blueberry", "Red Bricks"], fromStorePack: "Education Pack"},
 			"Barky's Mask": {rarity: 21, splice: ["Barrel", "Painting: Yerfdog"]},
 			"Baseball Bat": {rarity: 12, splice: ["House Entrance", "Sign"]},
 			"Bed": {rarity: 14, splice: ["Wooden Chair", "Mushroom"]},
-			"Big Old Down Arrow": {rarity: 13, splice: ["Devil Horns", "Pointy Sign"]},
+			"Big Old Down Arrow": {rarity: 13, splice: ["Devil Horns", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
 			"Blue Block": {rarity: 11, splice: ["Blueberry", "Bricks"]},
 			"Brainwave Capacitor": {rarity: 21, splice: ["Olde Timey Radio", "Yellow Block"]},
 			"Bubble Wrap": {rarity: 11, splice: ["Blueberry", "Glass Pane"]},
@@ -908,12 +908,12 @@
 			"Plumbing": {rarity: 18, splice: ["Bathtub", "Green Block"]},
 			"Rubber Ducky": {rarity: 23, splice: ["Bathtub", "Painting: Dink Duck"]},
 			"Sandstone": {rarity: 18, splice: ["Cactus", "Dirt"]},
-			"School Desk": {rarity: 20, splice: ["Wooden Chair", "Orange Block"]},
+			"School Desk": {rarity: 20, splice: ["Wooden Chair", "Orange Block"], fromStorePack: "Education Pack"},
 			"Seaweed": {rarity: 21, splice: ["Water Bucket", "Bush"]},
 			"Secret Passage": {rarity: 15, splice: ["Wood Block", "Big Old Sideways Arrow"]},
 			"Sexy Boxers": {rarity: 18, splice: ["Polka Dot Block", "Rose"]},
-			"Sheet Music: Flat Piano": {rarity: 15, splice: ["Sheet Music: Piano Note", "Rock"]},
-			"Sheet Music: Sharp Piano": {rarity: 22, splice: ["Sheet Music: Piano Note", "Death Spikes"]},
+			"Sheet Music: Flat Piano": {rarity: 15, splice: ["Sheet Music: Piano Note", "Rock"], fromStorePack: "Composer's Pack"},
+			"Sheet Music: Sharp Piano": {rarity: 22, splice: ["Sheet Music: Piano Note", "Death Spikes"], fromStorePack: "Composer's Pack"},
 			"Snorkel": {rarity: 15, splice: ["Bathtub", "Glass Pane"]},
 			"Street Sign": {rarity: 15, splice: ["Sidewalk", "Pointy Sign"]},
 			"Tangram Block": {rarity: 15, splice: ["Checker Wallpaper", "Grey Block"]},
@@ -921,7 +921,7 @@
 			"Tie Dyed Shirt": {rarity: 26, splice: ["Checker Wallpaper", "Polka Dot Block"]},
 			"TV Head": {rarity: 17, splice: ["Olde Timey Radio", "Wood Block"]},
 			"Wrought-Iron Fence": {rarity: 24, splice: ["Portcullis", "Pencil"]},
-			"Zombie-Stompin' Boots": {rarity: 15, splice: ["Grimstone", "Death Spikes"]},
+			"Zombie-Stompin' Boots": {rarity: 15, splice: ["Grimstone", "Death Spikes"], fromStorePack: "Zombie Defense Pack"},
 		
 			// Item of the Month
 			"Golden Razor Wings": {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}},
@@ -1162,24 +1162,42 @@
 					sourceInfo.push("Get " + item.fromGemsPack.count + " when buying the " + item.fromGemsPack.name + " package from the Store.");
 				}
 				if (item.fromStorePack) {
+					var packHasItem = function(pack, itemName) {
+						var hasItem = false;
+						if (pack.items && pack.items.hasOwnProperty(itemName)) hasItem = true;
+						if (pack.randomItems) {
+							for (var setIndex in pack.randomItems) {
+								if (pack.randomItems[setIndex].options.hasOwnProperty(itemName)) hasItem = true;
+							}
+						}
+						return hasItem;
+					};
 					if (!packs.hasOwnProperty(item.fromStorePack)) {
 						error("Item ", itemName, " refers to missing store pack \"", item.fromStorePack, "\"");
 					} else {
 						var pack = packs[item.fromStorePack];
-						if (!pack.items.hasOwnProperty(itemName)) {
+						if (!pack) {
+							error("Item ", itemName, " says it's in the store pack \"", item.fromStorePack, "\", which doesn't exist!");
+						} else if (!packHasItem(pack, itemName)) {
 							error("Item ", itemName, " says it's in the store pack \"", item.fromStorePack, "\", which doesn't include it.");
 						} else {
-							var itemInPack = pack.items[itemName];
-							var t = "Get " + itemInPack + " when buying the "
-							+ "<a href=\"#" + makePackLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store";
+							if (pack.items && pack.items.hasOwnProperty(itemName)) {
+								var itemInPack = pack.items[itemName];
+								var t = "Get " + itemInPack + " when buying the "
+								+ "<a href=\"#" + makePackLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store";
 
-							if (pack.availableDuringEvent) {
-								t += " during " + pack.availableDuringEvent + ".";
+								if (pack.availableDuringEvent) {
+									t += " during " + pack.availableDuringEvent + ".";
+								} else {
+									t += ".";
+								}
+
+								sourceInfo.push(t);
 							} else {
-								t += ".";
+								// It's a random chance from that pack.
+								sourceInfo.push("Get randomly when buying the "
+								+ "<a href=\"#" + makePackLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store");
 							}
-
-							sourceInfo.push(t);
 						}
 					}
 				}
