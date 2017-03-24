@@ -27,3 +27,5 @@ I'm gradually filling in the item data. It's messy, but once I have it in a dece
 	- Player
 	- Inventory
 	- Special block (eg sewing machine)
+- How to earn Growtokens
+- How to earn Gems???
