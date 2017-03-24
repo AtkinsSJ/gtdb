@@ -1312,7 +1312,6 @@
 						if (!items[childName]) {
 							error("Pack", packName, "item not found: ", childName);
 							missingItemNames.push(childName);
-							continue;
 						} else {
 							var item = items[childName];
 							if (item.fromStorePack != packName) {
