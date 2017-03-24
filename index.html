@@ -171,8 +171,18 @@
 
 			"Composer's Pack": {
 				cost: 5000,
-				items: {
-				},
+				randomItems: [
+					{count: 100, options: {
+						"Sheet Music: Blank" : 1,
+						"Sheet Music: Piano Note": 1,
+						"Sheet Music: Drums": 1,
+						"Sheet Music: Sharp Piano": 1,
+						"Sheet Music: Flat Piano ": 1,
+						"Sheet Music: Bass Note": 1,
+						"Sheet Music: Sharp Bass": 1,
+						"Sheet Music: Flat Bass": 1,
+					}},
+				],
 				section: "Item Packs"
 			},
 			"Fantasy Pack": {
@@ -384,10 +394,13 @@
 				items: {
 					"Security Camera": 1,
 					"Display Boxes": 4,
+					"For Sale Sign": 1,
+					"Gem Sign": 1,
+					"Exclamation Sign": 1,
+					"Shop Sign": 1,
 					"Open Sign": 1,
 					"Cash Register": 1,
 					"Mannequin ": 1,
-					// TODO: "4 different kinds of signs" - out of what?
 				},
 				section: "Item Packs"
 			},
@@ -473,6 +486,22 @@
 					"Phone Booth": 1,
 					// TODO: Random items! 1 mask, 1 boot, 1 shirt, 1 cape, and 1 logo
 				},
+				randomItems: [
+					{count: 1, options: {
+						"Super Eye Mask - Red": 1,
+						"Crimefighter Mask - Red": 1,
+						"Super Eye Mask - Green": 1,
+						"Crimefighter Mask - Green": 1,
+						"Super Eye Mask - Blue": 1,
+						"Crimefighter Mask - Blue": 1,
+						"Super Eye Mask - Purple": 1,
+						"Crimefighter Mask - Purple": 1,
+						"Super Eye Mask - Black": 1,
+						"Crimefighter Mask - Black": 1,
+						"Super Eye Mask - Gold": 1,
+						"Crimefighter Mask - Gold": 1,
+					}},
+				],
 				section: "Item Packs"
 			},
 			"Crime Wave": {
@@ -761,10 +790,46 @@
     		"Chemsynth Centrifuge": {fromStorePack: "Chemsynth Pack"},
     		"Chemsynth Stirrer": {fromStorePack: "Chemsynth Pack"},
 
+    		// "Awesome Items"
+			"Turtle Hat": {store: {section: "Awesome Items", cost: 25000}},
+			"Tiny Horsie": {store: {section: "Awesome Items", cost: 25000}},
+			"Pleiadian Star Ship": {store: {section: "Awesome Items", cost: 25000}},
+			"Dragon Hand": {store: {section: "Awesome Items", cost: 50000}},
+			"Little Red Corvette": {store: {section: "Awesome Items", cost: 25000}},
+			"Stick Horse": {store: {section: "Awesome Items", cost: 25000}},
+			"Ambulance": {store: {section: "Awesome Items", cost: 25000}},
+			"Riding Raptor": {store: {section: "Awesome Items", cost: 25000}},
+			"Mid-Pacific Owl": {store: {section: "Awesome Items", cost: 30000}},
+			"Unicorn Garland": {store: {section: "Awesome Items", cost: 50000}},
+			"Starboard": {store: {section: "Awesome Items", cost: 30000}},
+			"Growley Motorcycle": {store: {section: "Awesome Items", cost: 50000}},
+			"Geiger Counter": {store: {section: "Awesome Items", cost: 25000}},
+			"Monkey On Your Back": {store: {section: "Awesome Items", cost: 50000}},
+			"Carrot Sword": {store: {section: "Awesome Items", cost: 15000}},
+			"Red Bicycle": {store: {section: "Awesome Items", cost: 30000}},
+			"Fire Truck": {store: {section: "Awesome Items", cost: 50000}},
+			"Pet Slime": {store: {section: "Awesome Items", cost: 100000}},
+			"Silkworm": {store: {section: "Awesome Items", cost: 7000}},
+
+			// "Locks And Stuff"
+			"Small Lock": {store: {section: "Locks And Stuff", cost: 50}},
+			"Big Lock": {store: {section: "Locks And Stuff", cost: 200}},
+			"Huge Lock": {store: {section: "Locks And Stuff", cost: 500}},
+			"World Lock": {store: {section: "Locks And Stuff", cost: 2000}},
+			"Grow Spray Fertilizer": {store: {section: "Locks And Stuff", cost: 200}},
+			"Deluxe Grow Spray": {store: {section: "Locks And Stuff", cost: 900}},
+			"Signal Jammer": {store: {section: "Locks And Stuff", cost: 2000}},
+			"Zombie Jammer": {store: {section: "Locks And Stuff", cost: 15000}},
+			"Punch Jammer": {store: {section: "Locks And Stuff", cost: 15000}},
+			"Birth Certificate": {store: {section: "Locks And Stuff", cost: 20000}},
+			"Change of Address": {store: {section: "Locks And Stuff", cost: 20000}},
+			"Door Mover": {store: {section: "Locks And Stuff", cost: 5000}},
+			"Vending Machine": {store: {section: "Locks And Stuff", cost: 8000}},
+
 			// Growtokens
 			"Challenge Timer": {tokenStore: 5},
 			"Experience Potion": {tokenStore: 10},
-			"Megaphone": {tokenStore: 10},
+			"Megaphone": {tokenStore: 10, fromGemsPack: {name: "It's Rainin' Gems", count: 1}},
 			"Derpy Star Block": {tokenStore: 30},
 			"BLYoshi's Free Dirt": {tokenStore: 40},
 			"Nothingness": {tokenStore: 50},
@@ -925,6 +990,9 @@
 				if (item.spawnsInEvent) {
 					sourceInfo.push("Spawns in the '" + item.spawnsInEvent + "' special event.");
 				}
+				if (item.fromGemsPack) {
+					sourceInfo.push("Get " + item.fromGemsPack.count + " when buying the " + item.fromGemsPack.name + " package from the Store.");
+				}
 				if (item.fromStorePack) {
 					if (!packs.hasOwnProperty(item.fromStorePack)) {
 						if (debugMode) {
@@ -1054,21 +1122,51 @@
 				contents.innerText = "Contents:";
 				infoBox.appendChild(contents);
 				var contentsList = document.createElement("ul");
-				var contentNames = Object.keys(pack.items);
-				for (var i = 0; i < contentNames.length; i++) {
-					var childName = contentNames[i];
+				if (pack.items) {
+					var contentNames = Object.keys(pack.items);
+					for (var i = 0; i < contentNames.length; i++) {
+						var childName = contentNames[i];
 
-					var a = document.createElement("a");
-					a.href = "#" + makeItemLinkID(childName);
-					a.innerText = childName;
-					var li = document.createElement("li");
-					li.appendChild(a);
-					var x = document.createElement("span");
-					x.innerText = " x" + pack.items[childName];
-					li.appendChild(x);
-					contentsList.appendChild(li);
+						var a = document.createElement("a");
+						a.href = "#" + makeItemLinkID(childName);
+						a.innerText = childName;
+						var li = document.createElement("li");
+						li.appendChild(a);
+						var x = document.createElement("span");
+						x.innerText = " x" + pack.items[childName];
+						li.appendChild(x);
+						contentsList.appendChild(li);
+					}
+
 				}
+					
+				if (pack.randomItems) {
+					for (var i = 0; i < pack.randomItems.length; i++) {
+						randomSet = pack.randomItems[i];
+						var subLi = document.createElement("li");
+						var setTitle = document.createElement("em");
+						setTitle.innerText = randomSet.count + " random selections from:";
+						subLi.appendChild(setTitle);
 
+						var subList = document.createElement("ul");
+						subLi.appendChild(subList);
+						var contentNames = Object.keys(randomSet.options);
+						for (var i = 0; i < contentNames.length; i++) {
+							var childName = contentNames[i];
+
+							var a = document.createElement("a");
+							a.href = "#" + makeItemLinkID(childName);
+							a.innerText = childName;
+							var li = document.createElement("li");
+							li.appendChild(a);
+							var x = document.createElement("span");
+							x.innerText = " x" + randomSet.options[childName];
+							li.appendChild(x);
+							subList.appendChild(li);
+						}
+						contentsList.appendChild(subLi);
+					}
+				}
 				infoBox.appendChild(contentsList);
 
 				var wikiLink = document.createElement("a");
