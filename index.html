@@ -15,10 +15,6 @@
 			margin: 1em;
 		}
 
-		li {
-			margin-left: 1em;
-		}
-
 		.theHeader {
 
 		}
@@ -76,6 +72,11 @@
 			width: 25em;
 		}
 
+		.itemInfoBox li,
+		.packInfoBox li {
+			margin-left: 1em;
+		}
+
 	</style>
 </head>
 
@@ -94,6 +95,10 @@
 		<div>
 			<h2>Item Packs (<span id="packCount"></span>)</h2>
 			<ul id="packsList"></ul>
+		</div>
+		<div>
+			<h2>Missing Items (<span id="missingItemCount"></span>)</h2>
+			<ul id="missingItemsList"></ul>
 		</div>
 	</nav>
 
@@ -975,6 +980,7 @@
 			"Growie Award": {competitionPrize: "Video of the Week", competitionURL: "https://www.growtopiagame.com/forums/showthread.php?77092-Nominate-Youtube-videos-for-Growies-here!"},
 			"Ultra Trophy 3000": {competitionPrize: "World of the Day", competitionURL: "https://www.growtopiagame.com/forums/showthread.php?353202-Is-your-world-good-enough-to-be-a-World-Of-The-Day-!"},
 		};
+		var missingItemNames = [];
 
 		function makeItemLinkID(name) {
 			var regex = /\s/g;
@@ -1007,6 +1013,9 @@
 
 			return children;
 		}
+
+		var error = function(){};
+		if (debugMode) error = console.error;
 
 		// Items
 		var itemsList = document.getElementById("itemsList");
@@ -1062,22 +1071,22 @@
 				if (item.splice) {
 					var parent1 = items[item.splice[0]];
 					var parent2 = items[item.splice[1]];
-					if (debugMode) {
-						// Check splicing parent names
-						if (!parent1) {
-							console.error("Item", itemName, "parent item not found: ", item.splice[0]);
-							continue;
-						}
-						if (!parent2) {
-							console.error("Item", itemName, "parent item not found: ", item.splice[1]);
-							continue;
-						}
+					// Check splicing parent names
+					if (!parent1) {
+						error("Item", itemName, "parent item not found: ", item.splice[0]);
+						missingItemNames.push(item.splice[0]);
+						continue;
+					}
+					if (!parent2) {
+						error("Item", itemName, "parent item not found: ", item.splice[1]);
+						missingItemNames.push(item.splice[1]);
+						continue;
+					}
 
-						// Check the rarities match!
-						var targetRarity = parent1.rarity + parent2.rarity;
-						if (item.rarity != targetRarity) {
-							console.error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
-						}
+					// Check the rarities match!
+					var targetRarity = parent1.rarity + parent2.rarity;
+					if (item.rarity != targetRarity) {
+						error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
 					}
 
 					sourceInfo.push("Plant a " + itemName + " seed, or splice a "
@@ -1092,10 +1101,9 @@
 						for (var i = 0; i < item.spawnsInWorlds.length; i++) {
 							var blastName = item.spawnsInWorlds[i];
 
-							if (debugMode) {
-								if (!(blastName == "normal" || items[blastName])) {
-									console.error("Blast item not found:", blastName, "for item", itemName);
-								}
+							if (!(blastName == "normal" || items[blastName])) {
+								error("Blast item not found:", blastName, "for item", itemName);
+								missingItemNames.push(blastName);
 							}
 
 							if (item.spawnsInWorlds.length > 1) {
@@ -1120,15 +1128,11 @@
 				}
 				if (item.fromStorePack) {
 					if (!packs.hasOwnProperty(item.fromStorePack)) {
-						if (debugMode) {
-							console.error("Item ", itemName, " refers to missing store pack \"", item.fromStorePack, "\"");
-						}
+						error("Item ", itemName, " refers to missing store pack \"", item.fromStorePack, "\"");
 					} else {
 						var pack = packs[item.fromStorePack];
 						if (!pack.items.hasOwnProperty(itemName)) {
-							if (debugMode) {
-								console.error("Item ", itemName, " says it's in the store pack \"", item.fromStorePack, "\", which doesn't include it.");
-							}
+							error("Item ", itemName, " says it's in the store pack \"", item.fromStorePack, "\", which doesn't include it.");
 						} else {
 							var itemInPack = pack.items[itemName];
 							var t = "Get " + itemInPack + " when buying the "
@@ -1252,6 +1256,17 @@
 					for (var i = 0; i < contentNames.length; i++) {
 						var childName = contentNames[i];
 
+						if (!items[childName]) {
+							error("Pack", packName, "item not found: ", childName);
+							missingItemNames.push(childName);
+							continue;
+						} else {
+							var item = items[childName];
+							if (item.fromStorePack != packName) {
+								error("Pack", packName, "item", childName, "doesn't include that pack as a source!");
+							}
+						}
+
 						var a = document.createElement("a");
 						a.href = "#" + makeItemLinkID(childName);
 						a.innerText = childName;
@@ -1289,15 +1304,14 @@
 							li.appendChild(x);
 							subList.appendChild(li);
 
-							if (debugMode) {
-								if (!items[childName]) {
-									console.error("Pack", packName, "item not found: ", childName);
-									continue;
-								} else {
-									var item = items[childName];
-									if (item.fromStorePack != packName) {
-										console.error("Pack", packName, "item", childName, "doesn't include that pack as a source!");
-									}
+							if (!items[childName]) {
+								error("Pack", packName, "item not found: ", childName);
+								missingItemNames.push(childName);
+								continue;
+							} else {
+								var item = items[childName];
+								if (item.fromStorePack != packName) {
+									error("Pack", packName, "item", childName, "doesn't include that pack as a source!");
 								}
 							}
 						}
@@ -1313,23 +1327,21 @@
 				infoBox.appendChild(wikiLink);
 
 				packInfoBoxes.appendChild(infoBox);
+			}
+		}
 
-				if (debugMode) {
-					// Ensure all contained items are valid!
-					for (var i = 0; i < contentNames.length; i++) {
-						var childName = contentNames[i];
-
-						if (!items[childName]) {
-							console.error("Pack", packName, "item not found: ", childName);
-							continue;
-						} else {
-							var item = items[childName];
-							if (item.fromStorePack != packName) {
-								console.error("Pack", packName, "item", childName, "doesn't include that pack as a source!");
-							}
-						}
-					}
-				}
+		// Packs
+		var missingItemsList = document.getElementById("missingItemsList");
+		missingItemNames.sort();
+		document.getElementById("missingItemCount").innerText = missingItemNames.length;
+		for (var missingItemIndex in missingItemNames) {
+			var missingItemName = missingItemNames[missingItemIndex];
+		
+			// TOC
+			{
+				var li = document.createElement("li");
+				li.innerText = missingItemName;
+				missingItemsList.appendChild(li);
 			}
 		}
 	</script>
