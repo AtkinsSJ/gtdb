@@ -15,6 +15,10 @@
 			margin: 1em;
 		}
 
+		li {
+			margin-left: 1em;
+		}
+
 		.theHeader {
 
 		}
@@ -586,17 +590,17 @@
 		// But I'm starting off with SEEDIARY's info, so these are in the order they appear there!
 		var items = {
 			// GEN I
-			"Dirt": {rarity: 1, spawnsInWorld: "normal", spriteIndex: 1},
-			"Cave Background": {rarity: 1, spawnsInWorld: "normal", spriteIndex: 7},
-			"Rock": {rarity: 1, spawnsInWorld: "normal", spriteIndex: 5},
-			"Lava": {rarity: 1, spawnsInWorld: "normal", spriteIndex: 2},
+			"Dirt": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 1},
+			"Cave Background": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 7},
+			"Rock": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 5},
+			"Lava": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 2},
 			"Crystal Block": {rarity: 100, spawnsInEvent: "Beautiful Crystal"},
-			"Sand": {rarity: 1, spawnsInWorld: "Beach Blast"},
-			"Ocean Rock": {rarity: 1, spawnsInWorld: "Beach Blast"},
+			"Sand": {rarity: 1, spawnsInWorlds: ["Beach Blast"]},
+			"Ocean Rock": {rarity: 1, spawnsInWorlds: ["Beach Blast", "Undersea Blast"]},
 			"Garbage": {rarity: 1},
-			"Sandstone Wall": {rarity: 1, spawnsInWorld: "Desert Blast"},
-			"Boulder": {rarity: 1, spawnsInWorld: "Desert Blast"},
-			"Obelisk": {rarity: 30, spawnsInWorld: "Desert Blast", spriteIndex: 487},
+			"Sandstone Wall": {rarity: 1, spawnsInWorlds: ["Desert Blast"]},
+			"Boulder": {rarity: 1, spawnsInWorlds: ["Desert Blast"]},
+			"Obelisk": {rarity: 30, spawnsInWorlds: ["Desert Blast"], spriteIndex: 487},
 			// Gen II
 			"Door": {rarity: 2, splice: ["Dirt", "Cave Background"], fromStorePack: "Door & Sign Hello Pack", spriteIndex: 6},
 			"Sign": {rarity: 2, splice: ["Rock", "Cave Background"], fromStorePack: "Door & Sign Hello Pack", spriteIndex: 10},
@@ -866,12 +870,57 @@
 				var source = document.createElement("p");
 				var sourceInfo = [];
 				if (item.splice) {
+					var parent1 = items[item.splice[0]];
+					var parent2 = items[item.splice[1]];
+					if (debugMode) {
+						// Check splicing parent names
+						if (!parent1) {
+							console.error("Item", itemName, "parent item not found: ", item.splice[0]);
+							continue;
+						}
+						if (!parent2) {
+							console.error("Item", itemName, "parent item not found: ", item.splice[1]);
+							continue;
+						}
+
+						// Check the rarities match!
+						var targetRarity = parent1.rarity + parent2.rarity;
+						if (item.rarity != targetRarity) {
+							console.error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
+						}
+					}
+
 					sourceInfo.push("Plant a " + itemName + " seed, or splice a "
 					+ "<a href=\"#" + makeItemLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
 					+ "<a href=\"#" + makeItemLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.");
 				}
-				if (item.spawnsInWorld) {
-					sourceInfo.push("Spawns naturally in new " + item.spawnsInWorld + " worlds.");
+				if (item.spawnsInWorlds) {
+					if (item.spawnsInWorlds.length == 1 && item.spawnsInWorlds[0] == "normal") {
+						sourceInfo.push("Spawns naturally in new worlds.");
+					} else {
+						var t = "Spawns naturally in new ";
+						for (var i = 0; i < item.spawnsInWorlds.length; i++) {
+							var blastName = item.spawnsInWorlds[i];
+
+							if (debugMode) {
+								if (!(blastName == "normal" || items[blastName])) {
+									console.error("Blast item not found:", blastName, "for item", itemName);
+								}
+							}
+
+							if (item.spawnsInWorlds.length > 1) {
+								if (i == item.spawnsInWorlds.length - 1) {
+									t += " and ";
+								} else if (i != 0) {
+									t += ", ";
+								}
+							}
+
+							t += "<a href=\"#" + makeItemLinkID(blastName) + "\">" + blastName + "</a> ";
+						}
+						t += "worlds.";
+						sourceInfo.push(t);
+					}
 				}
 				if (item.spawnsInEvent) {
 					sourceInfo.push("Spawns in the '" + item.spawnsInEvent + "' special event.");
@@ -951,29 +1000,6 @@
 				infoBox.appendChild(wikiLink);
 
 				itemInfoBoxes.appendChild(infoBox);
-			}
-
-			if (debugMode) {
-				if (item.splice) {
-					// Check splicing parent names
-					var parent1 = items[item.splice[0]];
-					var parent2 = items[item.splice[1]];
-
-					if (!parent1) {
-						console.error("Item", itemName, "parent item not found: ", item.splice[0]);
-						continue;
-					}
-					if (!parent2) {
-						console.error("Item", itemName, "parent item not found: ", item.splice[1]);
-						continue;
-					}
-
-					// Check the rarities match!
-					var targetRarity = parent1.rarity + parent2.rarity;
-					if (item.rarity != targetRarity) {
-						console.error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
-					}
-				}
 			}
 		}
 

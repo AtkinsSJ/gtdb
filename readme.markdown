@@ -19,7 +19,6 @@ I'm gradually filling in the item data. It's messy, but once I have it in a dece
 	- Image indexes
 	- Item data
 
-- Have items spawned in a world link to their blast
 - Handle random items from Item Packs
 	- Also, random drops from trees. Maybe use the same system?
 	- Wizard Hat Seed from Fantasy Pack - similar again?
