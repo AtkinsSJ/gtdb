@@ -106,27 +106,478 @@
 			spriteHeight = 32;
 
 		var packs = {
+			// Event Packs
 			"St. Patrick's Pack": {
 				cost: 5000,
-				items: {"Orange Beard": 1,
-						"Leprechaun Suit": 1,
-						"Leprechaun Shoes": 1,
-						"Green Pants": 1,
-						"Leprechaun Hat": 1,
-						"Pot O' Gold": 1,
-						"Green Beer": 6},
+				items: {
+					"Orange Beard": 1,
+					"Leprechaun Suit": 1,
+					"Leprechaun Shoes": 1,
+					"Green Pants": 1,
+					"Leprechaun Hat": 1,
+					"Pot O' Gold": 1,
+					"Green Beer": 6,
+				},
 				availableDuringEvent: "St. Patrick's Week"
+			},
+
+			// Item Packs store area
+			"Door & Sign Hello Pack": {
+				cost: 15,
+				items: {
+					"Door": 1,
+					"Sign": 1,
+				},
+				section: "Item Packs"
+			},
+			"Gangland Style": {
+				cost: 5000,
+				items: {
+					"Fedora": 1,
+					"Dame's Fedora": 1,
+					"Pinstripe Suit": 1,
+					"Pinstripe Pants": 1,
+					"Flapper Headband": 1,
+					"Flapper Dress": 1,
+					"Cigar": 1,
+					"Tommygun": 1,
+					"Victrola": 1,
+					"Art Deco Block": 10,
+				},
+				section: "Item Packs"
+			},
+			"Racing Action Pack": {
+				cost: 3500,
+				items: {
+					"Red Sportsball Jersey": 1,
+					"Red Sweatpants": 1,
+					"Blue Headband": 1,
+					"Blue Wristband": 1,
+					"Pigtail": 1,
+					"Air Robinsons": 1,
+					"Race Start Flag": 1,
+					"Race End Flag": 1,
+					"Checkpoints": 2,
+					"Big Old Sideways Arrow": 2,
+					"Big Old Up Arrow": 1,
+					"Big Old Down Arrow": 1,
+				},
+				section: "Item Packs"
+			},
+
+			"Composer's Pack": {
+				cost: 5000,
+				items: {
+				},
+				section: "Item Packs"
+			},
+			"Fantasy Pack": {
+				cost: 5000,
+				items: {
+					"Wizard's Robe": 1,
+					"Elvish Longbow": 1,
+					"Golden Sword": 1,
+					"Tavern Sign": 3,
+					"Barrel": 10,
+					"Dragon Gate": 3,
+					"Treasure Chest": 3,
+					"Wizard Hat Seed": 1,
+				},
+				section: "Item Packs"
+			},
+			"Education Pack": {
+				cost: 5000,
+				items: {
+					"Grey Hair Bun ": 1,
+					"Growtopia Lunchbox ": 1,
+					"School Desk": 3,
+					"Chalkboard": 10,
+					"Red Bricks": 20,
+					"Bulletin Board": 1,
+					"Apple": 1,
+				},
+				section: "Item Packs"
+			},
+			"Dungeon Pack": {
+				cost: 10000,
+				items: {
+					"Grimstone": 20,
+					"Blackrock Wall": 20,
+					"Iron Bars": 20,
+					"Jail Doors": 3,
+					"Skeletons": 3,
+					"Headsman's Axe": 1,
+					"Worthless Rags": 1,
+					"Torches": 5,
+					"Iron Mask": 1,
+				},
+				section: "Item Packs"
+			},
+			"Zombie Defense Pack": {
+				cost: 10000,
+				items: {
+					"Sawed-Off Shotgun": 1,
+					"Combat Vest": 1,
+					"Zombie-Stompin' Boots": 1,
+					"Traffic Barricade": 3,
+					"Military Radio": 1,
+					"Antidote": 1,
+					"Toxic Waste Barrel": 3,
+					"Biohazard Sign": 3,
+					"Tombstone": 3,
+					"G-Virus": 1,
+				},
+				section: "Item Packs"
+			},
+			"Vegas Pack": {
+				cost: 20000,
+				items: {
+					"Neon Lights": 10,
+					"Card Block Seed": 1,
+					"Pink Cadillac": 1,
+					"Flipping Coin": 4,
+					"Dice Block": 5,
+					"Gambler's Visor": 1,
+					"Slot Machine": 1,
+					"Roulette Wheel": 4,
+					"Showgirl Headdress": 1,
+					"Showgirl Top": 1,
+					"Showgirl Leggings": 1,
+				},
+				section: "Item Packs"
+			},
+			"Farm Pack": {
+				cost: 15000,
+				items: {
+					"Cow": 1,
+					"Chicken": 1,
+					"Wheat": 10,
+					"Barn Blocks": 10,
+					"Red Wood Walls": 10,
+					"Barn Door": 1,
+					"Straw Hat": 1,
+					"Overalls": 1,
+					"Pitchfork": 1,
+					"Farmgirl Hair": 1,
+					"Dear John Tractor": 1,
+				},
+				section: "Item Packs"
+			},
+			"Mad Science Kit": {
+				cost: 5000,
+				items: {
+					"Science Station": 1,
+					"Laboratory": 1,
+					"Lab Coat": 1,
+					"Combover": 1,
+					"Ze Goggles": 1,
+					"Chemical R": 5,
+					"Chemical G": 10,
+					"Chemical Y": 5,
+					"Chemical B": 5,
+					"Chemical P": 5,
+					"Death Ray": 1,
+				},
+				section: "Item Packs"
+			},
+			"City Pack": {
+				cost: 8000,
+				items: {
+					"Sidewalks": 10,
+					"Street Signs": 3,
+					"Streetlamps": 3,
+					"Gothic Building tiles": 10,
+					"Tenement Building tiles": 10,
+					"Fire Escapes": 10,
+					"Hedges": 10,
+					"Blue Mailbox": 1,
+					"Gargoyles": 3,
+					"Fire Hydrant": 1,
+					"ATM Machine": 1,
+				},
+				section: "Item Packs"
+			},
+			"Wild West Pack": {
+				cost: 8000,
+				items: {
+					"Cowboy Hat": 1,
+					"Cowboy Boots": 1,
+					"War Paint": 1,
+					"Face Bandana": 1,
+					"Sheriff's Vest": 1,
+					"Layer Cake Dress": 1,
+					"Corset": 1,
+					"Kansas Curls": 1,
+					"Western Building": 10,
+					"Saloon Doors": 1,
+					"Western Banners": 5,
+					"Buffalo": 1,
+					"Rustic Fences": 10,
+					"Campfire": 1,
+					"Parasol": 1,
+					"Six Shooter": 1,
+				},
+				section: "Item Packs"
+			},
+			"Astro Pack": {
+				cost: 5000,
+				items: {
+					"Astronaut Pack": 1,
+					"Astronaut Helmet": 1,
+					"Space Suit": 1,
+					"Space Pants": 1,
+					"Moon Boots": 1,
+					"Rocket Thruster": 1,
+					"Solar Panel": 1,
+					"Space Connector": 6,
+					"Porthole": 1,
+					"Forcefield": 1,
+					"Compu Panel": 1,
+					"Zorbnik DNA": 1,
+				},
+				section: "Item Packs"
+			},
+			"Surgical Kit": {
+				cost: 12000,
+				items: {
+					"Heart Monitor": 1,
+					"Hospital Bed": 1,
+					"Surgical Sponge": 5,
+					"Surgical Scalpel": 5,
+					"Surgical Anesthetic": 5,
+					"Surgical Antiseptic": 5,
+					"Surgical Antibiotics": 5,
+					"Surgical Splint": 5,
+					"Surgical Stiches": 5,
+					"Surgical Lab Kit": 5,
+					"Surgical Defibrilator": 5,
+					"Surgical Pins": 5,
+					"Surgical Clamp": 5,
+					"Surgical Transfusion": 5,
+					"Surgical Ultrasound": 5,
+				},
+				section: "Item Packs"
+			},
+			"Prehistoric Pack": {
+				cost: 5000,
+				items: {
+					"Sabertooth Growtopian": 1,
+					"Caveman Club": 1,
+					"Cavewoman Hair": 1,
+					"Caveman Hair": 1,
+					"Sabertooth-Skin Toga": 1,
+					"Fuzzy Bikini Top": 1,
+					"Fuzzy Bikini Bottom": 1,
+					"Cliffside": 10,
+					"Rock Platform": 5,
+					"Cave Entrance": 1,
+					"Prehistoric Palm": 3,
+				},
+				section: "Item Packs"
+			},
+			"Shop Pack": {
+				cost: 10000,
+				items: {
+					"Security Camera": 1,
+					"Display Boxes": 4,
+					"Open Sign": 1,
+					"Cash Register": 1,
+					"Mannequin ": 1,
+					// TODO: "4 different kinds of signs" - out of what?
+				},
+				section: "Item Packs"
+			},
+			"Home Pack": {
+				cost: 5000,
+				items: {
+					"Wall Clock": 1,
+					"Television": 1,
+					"Window Curtains": 2,
+					"Couches": 4,
+					"Microwave": 1,
+					"Meaty Apron": 1,
+					"Ducky Pajama Top": 1,
+					"Ducky Pajama Pants": 1,
+					"Eggs Benedict": 1,
+				},
+				section: "Item Packs"
+			},
+			"Cinema Pack": {
+				cost: 6000,
+				items: {
+					"Clapboard": 1,
+					"Black Beret": 1,
+					"3D Glasses": 1,
+					"Theater Curtain": 6,
+					"Marquee Block": 6,
+					"Director's Chair": 1,
+					"Theater Seat": 4,
+					"Movie Screen": 6,
+					"Movie Camera": 1,
+					"GHX Speaker": 1,
+				},
+				section: "Item Packs"
+			},
+			"Adventure Pack": {
+				cost: 8000,
+				items: {
+					"Gateway To Adventure": 4,
+					"Path Marker": 4,
+					"Adventure Item - Rope": 1,
+					"Adventure Item - Torch": 1,
+					"Adventure Item - Banana": 1,
+					"Adventure Item - Key": 1,
+					"Adventure Item - Golden Idol": 1,
+					"Adventuring Mustache": 1,
+					"Explorer's Ponytail": 1,
+					"Lazy Cobra": 1,
+				},
+				section: "Item Packs"
+			},
+			"Rockin' Pack": {
+				cost: 9999,
+				items: {
+					"Keytar": 1,
+					"Bass Guitar": 1,
+					"Tambourine": 1,
+					"Starchild Makeup": 1,
+					"Rockin' Headband": 1,
+					"Leopard Leggings": 1,
+					"Shredded T-Shirt": 1,
+					"Drumkit": 1,
+					"Stage Support": 6,
+					"Mega Rock Speaker": 6,
+					"Rock N' Roll Wallpaper": 6,
+				},
+				section: "Item Packs"
+			},
+			"Game Pack": {
+				cost: 50000,
+				items: {
+					"Game Generator" : 1,
+					"Staging Platform" : 4,
+					"Game Block" : 4,
+					"Game Flag" : 4,
+					"Game Grave" : 4,
+					"Game Goal" : 4,
+				},
+				section: "Item Packs"
+			},
+			"Superhero Pack": {
+				cost: 8000,
+				items: {
+					"Phone Booth": 1,
+					// TODO: Random items! 1 mask, 1 boot, 1 shirt, 1 cape, and 1 logo
+				},
+				section: "Item Packs"
+			},
+			"Crime Wave": {
+				cost: 5000,
+				items: {
+					"Crime Wave": 1,
+					// TODO: Random superpower cards
+				},
+				section: "Item Packs"
+			},
+			"Fashion Pack": {
+				cost: 4000,
+				items: {
+					"Spotlight": 1,
+					"Jade Block": 3,
+					"Makeup": 1,
+					// TODO: Random fashion items
+				},
+				section: "Item Packs"
+			},
+			"Sportsball Pack": {
+				cost: 15000,
+				items: {
+					"Basketball Hoop": 2,
+					"Sporty Goal": 2,
+					"Stadium": 5,
+					"Crowded Stadium": 5,
+					"Football Helmet": 1,
+					"Growies Cap": 1,
+					// TODO: 1 of 6 random sports balls
+				},
+				section: "Item Packs"
+			},
+			"Fishin' Pack": {
+				cost: 10000,
+				items: {
+					"Fishing Rod": 1,
+					"Tackle Box": 1,
+					"Fish Tank": 10,
+					"Fish Tank Port": 1,
+					"Wiggly Worm": 5,
+				},
+				section: "Item Packs"
+			},
+			"Firefighter Pack": {
+				cost: 10000,
+				items: {
+					"Firefighter Helmet - Yellow": 1,
+					"Firefighter Pants - Yellow": 1,
+					"Firefighter Jacket - Yellow": 1,
+					"Firefighter Boots": 1,
+					"Fire Hose": 1,
+					"Firehouse": 1,
+				},
+				section: "Item Packs"
+			},
+			"Steampack": {
+				cost: 20000,
+				items: {
+					"Steam Tubes": 10,
+					"Steam Stompers": 2,
+					"Steam Organs": 2,
+					"Steam Vents": 2,
+					"Steam Valves": 2,
+					"Steampunk Top Hat": 1,
+				},
+				section: "Item Packs"
+			},
+			"Painter's Pack": {
+				cost: 30000,
+				items: {
+					"Paintbrush": 1,
+					// TODO: Random paints
+				},
+				section: "Item Packs"
+			},
+			"B.O.O. Training Pack": {
+				cost: 10000,
+				items: {
+					"Spectral Goggles": 1,
+					"Neutron Gun": 1,
+					"Neutron Pack": 1,
+					"Ghost Jars": 10,
+				},
+				section: "Item Packs"
+			},
+			"Paleontologist's Kit": {
+				cost: 20000,
+				items: {
+					"Fossil Brushes": 5,
+					"Rock Hammer": 1,
+					"Rock Chisel": 1,
+					"Blue Hardhat": 1,
+					"Fossil Prep Station": 1,
+				},
+				section: "Item Packs"
 			},
 
 			"Chemsynth Pack": {
 				cost: 10000,
-				items: {"Chemsynth Processor": 1,
-						"Chemsynth Tank": 10,
-						"Chemsynth Replicator": 1,
-						"Chemsynth Catalyst": 1,
-						"Chemsynth Solvent": 1,
-						"Chemsynth Centrifuge": 1,
-						"Chemsynth Stirrer ": 1},
+				items: {
+					"Chemsynth Processor": 1,
+					"Chemsynth Tank": 10,
+					"Chemsynth Replicator": 1,
+					"Chemsynth Catalyst": 1,
+					"Chemsynth Solvent": 1,
+					"Chemsynth Centrifuge": 1,
+					"Chemsynth Stirrer": 1,
+				},
 				section: "Item Packs"
 			},
 		};
@@ -327,8 +778,17 @@
 			"Digger's Spade": {tokenStore: 200},
 		};
 
-		function makeLinkID(name) {
+		function makeItemLinkID(name) {
 			var regex = /\s/g;
+			return name.replace(regex, "_");
+		}
+		function makePackLinkID(name) {
+			var regex = /(pack|kit)/i;
+			if (!name.match(regex)) {
+				name += " Pack";
+			}
+
+			regex = /\s/g;
 			return name.replace(regex, "_");
 		}
 
@@ -360,7 +820,7 @@
 		for (var itemIndex in allNames) {
 			var itemName = allNames[itemIndex];
 			var item = items[itemName];
-			var anchorName = makeLinkID(itemName);
+			var anchorName = makeItemLinkID(itemName);
 
 			// TOC
 			{
@@ -403,8 +863,8 @@
 				var sourceInfo = [];
 				if (item.splice) {
 					sourceInfo.push("Plant a " + itemName + " seed, or splice a "
-					+ "<a href=\"#" + makeLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
-					+ "<a href=\"#" + makeLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.");
+					+ "<a href=\"#" + makeItemLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
+					+ "<a href=\"#" + makeItemLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.");
 				}
 				if (item.spawnsInWorld) {
 					sourceInfo.push("Spawns naturally in new " + item.spawnsInWorld + " worlds.");
@@ -426,7 +886,7 @@
 						} else {
 							var itemInPack = pack.items[itemName];
 							var t = "Get " + itemInPack + " when buying the "
-							+ "<a href=\"#" + makeLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store";
+							+ "<a href=\"#" + makePackLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store";
 
 							if (pack.availableDuringEvent) {
 								t += " during " + pack.availableDuringEvent + ".";
@@ -439,7 +899,7 @@
 					}
 				}
 				if (item.rareWhenHarvesting) {
-					sourceInfo.push("Is a rare drop when harvesting <a href=\"#" + makeLinkID(item.rareWhenHarvesting) + "\">" + item.rareWhenHarvesting + "</a> trees.");
+					sourceInfo.push("Is a rare drop when harvesting <a href=\"#" + makeItemLinkID(item.rareWhenHarvesting) + "\">" + item.rareWhenHarvesting + "</a> trees.");
 				}
 				if (item.itemOfTheMonth) {
 					sourceInfo.push("Was the <a href=\"https://growtopiagame.com/itemomonth.php\" target=\"_blank\">Item of the Month</a> in " + item.itemOfTheMonth.month + " " + item.itemOfTheMonth.year + ", available in the Store for " + item.itemOfTheMonth.cost + " gems.");
@@ -466,7 +926,7 @@
 						var childName = childItems[i];
 
 						var a = document.createElement("a");
-						a.href = "#" + makeLinkID(childName);
+						a.href = "#" + makeItemLinkID(childName);
 						a.innerText = childName;
 						var li = document.createElement("li");
 						li.appendChild(a);
@@ -518,7 +978,7 @@
 		for (var packIndex in packNames) {
 			var packName = packNames[packIndex];
 			var pack = packs[packName];
-			var anchorName = makeLinkID(packName);
+			var anchorName = makePackLinkID(packName);
 
 			// TOC
 			{
@@ -565,7 +1025,7 @@
 					var childName = contentNames[i];
 
 					var a = document.createElement("a");
-					a.href = "#" + makeLinkID(childName);
+					a.href = "#" + makeItemLinkID(childName);
 					a.innerText = childName;
 					var li = document.createElement("li");
 					li.appendChild(a);
