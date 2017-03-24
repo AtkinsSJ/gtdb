@@ -35,6 +35,17 @@
 			background: yellow;
 		}
 
+		.tableOfContents {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: space-after;
+			align-items: flex-start;
+		}
+		.tableOfContents div {
+			flex-grow: 1;
+		}
+
 		.tableOfContents li {
 			list-style: none;
 		}
@@ -104,7 +115,20 @@
 						"Leprechaun Hat": 1,
 						"Pot O' Gold": 1,
 						"Green Beer": 6},
-				availableDuringEvent: "St. Patrick's Week"},
+				availableDuringEvent: "St. Patrick's Week"
+			},
+
+			"Chemsynth Pack": {
+				cost: 10000,
+				items: {"Chemsynth Processor": 1,
+						"Chemsynth Tank": 10,
+						"Chemsynth Replicator": 1,
+						"Chemsynth Catalyst": 1,
+						"Chemsynth Solvent": 1,
+						"Chemsynth Centrifuge": 1,
+						"Chemsynth Stirrer ": 1},
+				section: "Item Packs"
+			},
 		};
 
 		// NB: These are in any old order, we sort them later so they appear alphabetically.
@@ -265,7 +289,7 @@
 			"Cave Blast": {store: {section: "Weather Machines", cost: 30000}},
 			"Weather Machine - Stuff": {store: {section: "Weather Machines", cost: 50000}},
 
-			//St Patrick's Pack
+			//St. Patrick's Pack
 			"Orange Beard": {fromStorePack: "St. Patrick's Pack"},
 			"Leprechaun Suit": {fromStorePack: "St. Patrick's Pack"},
 			"Leprechaun Shoes": {fromStorePack: "St. Patrick's Pack"},
@@ -273,6 +297,14 @@
 			"Leprechaun Hat": {fromStorePack: "St. Patrick's Pack"},
 			"Pot O' Gold": {fromStorePack: "St. Patrick's Pack"},
 			"Green Beer": {fromStorePack: "St. Patrick's Pack"},
+			//Chemsynth Pack
+    		"Chemsynth Processor": {fromStorePack: "Chemsynth Pack"},
+    		"Chemsynth Tank": {fromStorePack: "Chemsynth Pack"},
+    		"Chemsynth Replicator": {fromStorePack: "Chemsynth Pack"},
+    		"Chemsynth Catalyst": {fromStorePack: "Chemsynth Pack"},
+    		"Chemsynth Solvent": {fromStorePack: "Chemsynth Pack"},
+    		"Chemsynth Centrifuge": {fromStorePack: "Chemsynth Pack"},
+    		"Chemsynth Stirrer ": {fromStorePack: "Chemsynth Pack"},
 
 			// Growtokens
 			"Challenge Timer": {tokenStore: 5},
@@ -552,6 +584,23 @@
 				infoBox.appendChild(wikiLink);
 
 				packInfoBoxes.appendChild(infoBox);
+
+				if (debugMode) {
+					// Ensure all contained items are valid!
+					for (var i = 0; i < contentNames.length; i++) {
+						var childName = contentNames[i];
+
+						if (!items[childName]) {
+							console.error("Pack", packName, "item not found: ", childName);
+							continue;
+						} else {
+							var item = items[childName];
+							if (item.fromStorePack != packName) {
+								console.error("Pack", packName, "item", childName, "doesn't include that pack as a source!");
+							}
+						}
+					}
+				}
 			}
 		}
 	</script>
