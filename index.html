@@ -47,6 +47,20 @@
 			float: left;
 		}
 
+		#itemInfoBoxes {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			align-items: stretch;
+			margin: -0.5em; /* To counter the margin on .itemInfoBox children */
+		}
+
+		.itemInfoBox {
+			flex-grow: 1;
+			margin: 0.5em;
+			width: 25em;
+		}
+
 	</style>
 </head>
 
@@ -54,10 +68,11 @@
 	<header class="theHeader">
 		<h1>Growtopia Item Database</h1>
 		<p>An incomplete list of every item in the game and how to get it. Hopefully there will be more features later!</p>
+		<p>And yes, I know this is SUPER UGLY. I'm a programmer not a designer. Be grateful it's not all magenta Comic Sans.</p>
 	</header>
 
 	<nav class="tableOfContents box">
-		<h2>All items</h2>
+		<h2>All items (<span id="itemCount"></span>)</h2>
 		<ul id="itemsList"></ul>
 	</nav>
 
@@ -278,6 +293,8 @@
 		var itemInfoBoxes = document.getElementById("itemInfoBoxes");
 		var allNames = Object.keys(items);
 		allNames.sort();
+
+		document.getElementById("itemCount").innerText = allNames.length;
 
 		for (var itemIndex in allNames) {
 			var itemName = allNames[itemIndex];
