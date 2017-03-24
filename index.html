@@ -72,11 +72,18 @@
 	</header>
 
 	<nav class="tableOfContents box">
-		<h2>All items (<span id="itemCount"></span>)</h2>
-		<ul id="itemsList"></ul>
+		<div>
+			<h2>All items (<span id="itemCount"></span>)</h2>
+			<ul id="itemsList"></ul>
+		</div>
+		<div>
+			<h2>Item Packs (<span id="packCount"></span>)</h2>
+			<ul id="packsList"></ul>
+		</div>
 	</nav>
 
 	<section id="itemInfoBoxes"></section>
+	<section id="packInfoBoxes"></section>
 
 	<footer class="theFooter">Growtopia &copy; Copyright Ubisoft.</footer>
 
@@ -86,6 +93,19 @@
 		var spriteSheetWidth = 32; // How many images wide is the spritesheet?
 		var spriteWidth = 32,
 			spriteHeight = 32;
+
+		var packs = {
+			"St. Patrick's Pack": {
+				cost: 5000,
+				items: {"Orange Beard": 1,
+						"Leprechaun Suit": 1,
+						"Leprechaun Shoes": 1,
+						"Green Pants": 1,
+						"Leprechaun Hat": 1,
+						"Pot O' Gold": 1,
+						"Green Beer": 6},
+				availableDuringEvent: "St. Patrick's Week"},
+		};
 
 		// NB: These are in any old order, we sort them later so they appear alphabetically.
 		// But I'm starting off with SEEDIARY's info, so these are in the order they appear there!
@@ -245,6 +265,15 @@
 			"Cave Blast": {store: {section: "Weather Machines", cost: 30000}},
 			"Weather Machine - Stuff": {store: {section: "Weather Machines", cost: 50000}},
 
+			//St Patrick's Pack
+			"Orange Beard": {fromStorePack: "St. Patrick's Pack"},
+			"Leprechaun Suit": {fromStorePack: "St. Patrick's Pack"},
+			"Leprechaun Shoes": {fromStorePack: "St. Patrick's Pack"},
+			"Green Pants": {fromStorePack: "St. Patrick's Pack"},
+			"Leprechaun Hat": {fromStorePack: "St. Patrick's Pack"},
+			"Pot O' Gold": {fromStorePack: "St. Patrick's Pack"},
+			"Green Beer": {fromStorePack: "St. Patrick's Pack"},
+
 			// Growtokens
 			"Challenge Timer": {tokenStore: 5},
 			"Experience Potion": {tokenStore: 10},
@@ -289,11 +318,11 @@
 			return children;
 		}
 
+		// Items
 		var itemsList = document.getElementById("itemsList");
 		var itemInfoBoxes = document.getElementById("itemInfoBoxes");
 		var allNames = Object.keys(items);
 		allNames.sort();
-
 		document.getElementById("itemCount").innerText = allNames.length;
 
 		for (var itemIndex in allNames) {
@@ -350,6 +379,32 @@
 				}
 				if (item.spawnsInEvent) {
 					sourceInfo.push("Spawns in the '" + item.spawnsInEvent + "' special event.");
+				}
+				if (item.fromStorePack) {
+					if (!packs.hasOwnProperty(item.fromStorePack)) {
+						if (debugMode) {
+							console.error("Item ", itemName, " refers to missing store pack \"", item.fromStorePack, "\"");
+						}
+					} else {
+						var pack = packs[item.fromStorePack];
+						if (!pack.items.hasOwnProperty(itemName)) {
+							if (debugMode) {
+								console.error("Item ", itemName, " says it's in the store pack \"", item.fromStorePack, "\", which doesn't include it.");
+							}
+						} else {
+							var itemInPack = pack.items[itemName];
+							var t = "Get " + itemInPack + " when buying the "
+							+ "<a href=\"#" + makeLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store";
+
+							if (pack.availableDuringEvent) {
+								t += " during " + pack.availableDuringEvent + ".";
+							} else {
+								t += ".";
+							}
+
+							sourceInfo.push(t);
+						}
+					}
 				}
 				if (item.rareWhenHarvesting) {
 					sourceInfo.push("Is a rare drop when harvesting <a href=\"#" + makeLinkID(item.rareWhenHarvesting) + "\">" + item.rareWhenHarvesting + "</a> trees.");
@@ -422,6 +477,83 @@
 			}
 		}
 
+		// Packs
+		var packsList = document.getElementById("packsList");
+		var packInfoBoxes = document.getElementById("packInfoBoxes");
+		var packNames = Object.keys(packs);
+		packNames.sort();
+		document.getElementById("packCount").innerText = packNames.length;
+		for (var packIndex in packNames) {
+			var packName = packNames[packIndex];
+			var pack = packs[packName];
+			var anchorName = makeLinkID(packName);
+
+			// TOC
+			{
+				var a = document.createElement("a");
+				a.href = "#" + anchorName;
+				a.innerText = packName;
+				var li = document.createElement("li");
+				li.appendChild(a);
+				packsList.appendChild(li);
+			}
+
+			// Info box
+			{
+				var infoBox = document.createElement("div");
+				infoBox.className = "packInfoBox box";
+				infoBox.id = anchorName;
+
+				var packHeading = document.createElement("h2");
+				packHeading.innerText = packName;
+				var anchor = document.createElement("a");
+				anchor.href = "#" + anchorName;
+				// TODO: Pack images?
+				// if (item.spriteIndex > 1) {
+				// 	var img = document.createElement("span");
+				// 	img.className = "itemImage";
+				// 	var spriteX = item.spriteIndex % spriteSheetWidth,
+				// 		spriteY = Math.floor(item.spriteIndex / spriteSheetWidth);
+				// 	img.style = "background-position: " + (-spriteWidth*spriteX) +"px " + (-spriteHeight*spriteY) + "px";
+				// 	anchor.appendChild(img);
+				// }
+				anchor.appendChild(packHeading);
+				infoBox.appendChild(anchor);
+
+				// Where is this used?
+				// This is a really really dumb check right now.
+				// Probably makes more sense to put everything in a DB on a server rather than here, but oh well.
+				
+				var contents = document.createElement("h3");
+				contents.innerText = "Contents:";
+				infoBox.appendChild(contents);
+				var contentsList = document.createElement("ul");
+				var contentNames = Object.keys(pack.items);
+				for (var i = 0; i < contentNames.length; i++) {
+					var childName = contentNames[i];
+
+					var a = document.createElement("a");
+					a.href = "#" + makeLinkID(childName);
+					a.innerText = childName;
+					var li = document.createElement("li");
+					li.appendChild(a);
+					var x = document.createElement("span");
+					x.innerText = " x" + pack.items[childName];
+					li.appendChild(x);
+					contentsList.appendChild(li);
+				}
+
+				infoBox.appendChild(contentsList);
+
+				var wikiLink = document.createElement("a");
+				wikiLink.href = makeWikiLink(packName);
+				wikiLink.target = "_blank";
+				wikiLink.innerText = "View on Growtopia Wiki";
+				infoBox.appendChild(wikiLink);
+
+				packInfoBoxes.appendChild(infoBox);
+			}
+		}
 	</script>
 </body>
 </html>
