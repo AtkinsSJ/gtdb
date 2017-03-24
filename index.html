@@ -36,7 +36,7 @@
 			margin-bottom: 1em;
 		}
 		.box:target {
-			background: yellow;
+			background: #ffffb1;
 		}
 
 		.tableOfContents {
@@ -80,7 +80,7 @@
 </head>
 
 <body>
-	<header class="theHeader">
+	<header class="theHeader box">
 		<h1>Growtopia Item Database</h1>
 		<p>An incomplete list of every item in the game and how to get it. Hopefully there will be more features later!</p>
 		<p>And yes, I know this is SUPER UGLY. I'm a programmer not a designer. Be grateful it's not all magenta Comic Sans.</p>
@@ -128,14 +128,15 @@
 			// Item Packs store area
 			"Door & Sign Hello Pack": {
 				cost: 15,
+				section: "Item Packs",
 				items: {
 					"Door": 1,
 					"Sign": 1,
 				},
-				section: "Item Packs"
 			},
 			"Gangland Style": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Fedora": 1,
 					"Dame's Fedora": 1,
@@ -148,10 +149,10 @@
 					"Victrola": 1,
 					"Art Deco Block": 10,
 				},
-				section: "Item Packs"
 			},
 			"Racing Action Pack": {
 				cost: 3500,
+				section: "Item Packs",
 				items: {
 					"Red Sportsball Jersey": 1,
 					"Red Sweatpants": 1,
@@ -166,11 +167,11 @@
 					"Big Old Up Arrow": 1,
 					"Big Old Down Arrow": 1,
 				},
-				section: "Item Packs"
 			},
 
 			"Composer's Pack": {
 				cost: 5000,
+				section: "Item Packs",
 				randomItems: [
 					{count: 100, options: {
 						"Sheet Music: Blank" : 1,
@@ -183,10 +184,11 @@
 						"Sheet Music: Flat Bass": 1,
 					}},
 				],
-				section: "Item Packs"
+				section: "Item Packs",
 			},
 			"Fantasy Pack": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Wizard's Robe": 1,
 					"Elvish Longbow": 1,
@@ -197,10 +199,10 @@
 					"Treasure Chest": 3,
 					"Wizard Hat Seed": 1,
 				},
-				section: "Item Packs"
 			},
 			"Education Pack": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Grey Hair Bun ": 1,
 					"Growtopia Lunchbox ": 1,
@@ -210,10 +212,10 @@
 					"Bulletin Board": 1,
 					"Apple": 1,
 				},
-				section: "Item Packs"
 			},
 			"Dungeon Pack": {
 				cost: 10000,
+				section: "Item Packs",
 				items: {
 					"Grimstone": 20,
 					"Blackrock Wall": 20,
@@ -225,10 +227,10 @@
 					"Torches": 5,
 					"Iron Mask": 1,
 				},
-				section: "Item Packs"
 			},
 			"Zombie Defense Pack": {
 				cost: 10000,
+				section: "Item Packs",
 				items: {
 					"Sawed-Off Shotgun": 1,
 					"Combat Vest": 1,
@@ -241,10 +243,10 @@
 					"Tombstone": 3,
 					"G-Virus": 1,
 				},
-				section: "Item Packs"
 			},
 			"Vegas Pack": {
 				cost: 20000,
+				section: "Item Packs",
 				items: {
 					"Neon Lights": 10,
 					"Card Block Seed": 1,
@@ -258,10 +260,10 @@
 					"Showgirl Top": 1,
 					"Showgirl Leggings": 1,
 				},
-				section: "Item Packs"
 			},
 			"Farm Pack": {
 				cost: 15000,
+				section: "Item Packs",
 				items: {
 					"Cow": 1,
 					"Chicken": 1,
@@ -275,10 +277,10 @@
 					"Farmgirl Hair": 1,
 					"Dear John Tractor": 1,
 				},
-				section: "Item Packs"
 			},
 			"Mad Science Kit": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Science Station": 1,
 					"Laboratory": 1,
@@ -292,10 +294,10 @@
 					"Chemical P": 5,
 					"Death Ray": 1,
 				},
-				section: "Item Packs"
 			},
 			"City Pack": {
 				cost: 8000,
+				section: "Item Packs",
 				items: {
 					"Sidewalks": 10,
 					"Street Signs": 3,
@@ -309,10 +311,10 @@
 					"Fire Hydrant": 1,
 					"ATM Machine": 1,
 				},
-				section: "Item Packs"
 			},
 			"Wild West Pack": {
 				cost: 8000,
+				section: "Item Packs",
 				items: {
 					"Cowboy Hat": 1,
 					"Cowboy Boots": 1,
@@ -331,10 +333,10 @@
 					"Parasol": 1,
 					"Six Shooter": 1,
 				},
-				section: "Item Packs"
 			},
 			"Astro Pack": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Astronaut Pack": 1,
 					"Astronaut Helmet": 1,
@@ -349,10 +351,10 @@
 					"Compu Panel": 1,
 					"Zorbnik DNA": 1,
 				},
-				section: "Item Packs"
 			},
 			"Surgical Kit": {
 				cost: 12000,
+				section: "Item Packs",
 				items: {
 					"Heart Monitor": 1,
 					"Hospital Bed": 1,
@@ -370,10 +372,10 @@
 					"Surgical Transfusion": 5,
 					"Surgical Ultrasound": 5,
 				},
-				section: "Item Packs"
 			},
 			"Prehistoric Pack": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Sabertooth Growtopian": 1,
 					"Caveman Club": 1,
@@ -387,10 +389,10 @@
 					"Cave Entrance": 1,
 					"Prehistoric Palm": 3,
 				},
-				section: "Item Packs"
 			},
 			"Shop Pack": {
 				cost: 10000,
+				section: "Item Packs",
 				items: {
 					"Security Camera": 1,
 					"Display Boxes": 4,
@@ -402,10 +404,10 @@
 					"Cash Register": 1,
 					"Mannequin ": 1,
 				},
-				section: "Item Packs"
 			},
 			"Home Pack": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Wall Clock": 1,
 					"Television": 1,
@@ -417,10 +419,10 @@
 					"Ducky Pajama Pants": 1,
 					"Eggs Benedict": 1,
 				},
-				section: "Item Packs"
 			},
 			"Cinema Pack": {
 				cost: 6000,
+				section: "Item Packs",
 				items: {
 					"Clapboard": 1,
 					"Black Beret": 1,
@@ -433,10 +435,10 @@
 					"Movie Camera": 1,
 					"GHX Speaker": 1,
 				},
-				section: "Item Packs"
 			},
 			"Adventure Pack": {
 				cost: 8000,
+				section: "Item Packs",
 				items: {
 					"Gateway To Adventure": 4,
 					"Path Marker": 4,
@@ -449,10 +451,10 @@
 					"Explorer's Ponytail": 1,
 					"Lazy Cobra": 1,
 				},
-				section: "Item Packs"
 			},
 			"Rockin' Pack": {
 				cost: 9999,
+				section: "Item Packs",
 				items: {
 					"Keytar": 1,
 					"Bass Guitar": 1,
@@ -466,10 +468,10 @@
 					"Mega Rock Speaker": 6,
 					"Rock N' Roll Wallpaper": 6,
 				},
-				section: "Item Packs"
 			},
 			"Game Pack": {
 				cost: 50000,
+				section: "Item Packs",
 				items: {
 					"Game Generator" : 1,
 					"Staging Platform" : 4,
@@ -478,13 +480,12 @@
 					"Game Grave" : 4,
 					"Game Goal" : 4,
 				},
-				section: "Item Packs"
 			},
 			"Superhero Pack": {
 				cost: 8000,
+				section: "Item Packs",
 				items: {
 					"Phone Booth": 1,
-					// TODO: Random items! 1 mask, 1 boot, 1 shirt, 1 cape, and 1 logo
 				},
 				randomItems: [
 					{count: 1, options: {
@@ -501,29 +502,133 @@
 						"Super Eye Mask - Gold": 1,
 						"Crimefighter Mask - Gold": 1,
 					}},
+					{count: 1, options: {
+						"Super Shirt - Red": 1,
+						"Superheroine Top - Red": 1,
+						"Super Shirt - Green": 1,
+						"Superheroine Top - Green": 1,
+						"Super Shirt - Blue": 1,
+						"Superheroine Top - Blue": 1,
+						"Super Shirt - Purple": 1,
+						"Superheroine Top - Purple": 1,
+						"Super Shirt - Black": 1,
+						"Superheroine Top - Black": 1,
+						"Super Shirt - Gold": 1,
+						"Superheroine Top - Gold": 1,
+					}},
+					{count: 1, options: {
+						"Heroic Tights - Red": 1,
+						"Super Tights - Red": 1,
+						"Heroic Tights - Green": 1,
+						"Super Tights - Green": 1,
+						"Heroic Tights - Blue": 1,
+						"Super Tights - Blue": 1,
+						"Heroic Tights - Purple": 1,
+						"Super Tights - Purple": 1,
+						"Heroic Tights - Black": 1,
+						"Super Tights - Black": 1,
+						"Heroic Tights - Gold": 1,
+						"Super Tights - Gold": 1,
+					}},
+					{count: 1, options: {
+						"Super Cape - Red": 1,
+						"Super Cape - Green": 1,
+						"Super Cape - Blue": 1,
+						"Super Cape - Purple": 1,
+						"Super Cape - Black": 1,
+						"Super Cape - Gold": 1,
+					}},
+					{count: 1, options: {
+						"Heroic Boots - Red": 1,
+						"Heroic Boots - Green": 1,
+						"Heroic Boots - Blue": 1,
+						"Heroic Boots - Purple": 1,
+						"Heroic Boots - Black": 1,
+						"Heroic Boots - Gold": 1,
+					}},
+					{count: 1, options: {
+						"Super Logo - Echo": 1,
+						"Super Logo - Eye": 1,
+						"Super Logo - Heart": 1,
+						"Super Logo - Lightning": 1,
+						"Super Logo - Skull": 1,
+					}},
 				],
-				section: "Item Packs"
+				section: "Item Packs",
 			},
 			"Crime Wave": {
 				cost: 5000,
+				section: "Item Packs",
 				items: {
 					"Crime Wave": 1,
-					// TODO: Random superpower cards
 				},
-				section: "Item Packs"
+				randomItems: [
+					{count: 5, options: {
+						"Superpower - Heat Vision": 5,
+						"Superpower - Incinerate": 5,
+						"Superpower - Flame On!": 5,
+						"Superpower - Liquify": 5,
+						"Superpower - Overheat": 5,
+						"Superpower - Ice Shards": 5,
+						"Superpower - Frost Breath": 5,
+						"Superpower - Ice Barrier": 5,
+						"Superpower - Puddle": 5,
+						"Superpower - Frozen Mirror": 5,
+						"Superpower - Super Strength": 5,
+						"Superpower - Super Speed": 5,
+						"Superpower - Enrage": 5,
+						"Superpower - Crush": 5,
+						"Superpower - Regeneration": 5,
+						"Superpower - Shocking Fist": 5,
+						"Superpower - Thunderstorm": 5,
+						"Superpower - Overcharge": 5,
+						"Superpower - Megawatt Pulse": 5,
+						"Superpower - Resuscitate": 5,
+					}},
+				],
+				section: "Item Packs",
 			},
 			"Fashion Pack": {
 				cost: 4000,
+				section: "Item Packs",
 				items: {
 					"Spotlight": 1,
 					"Jade Block": 3,
 					"Makeup": 1,
-					// TODO: Random fashion items
 				},
-				section: "Item Packs"
+				randomItems: [
+					{count: 3, options: {
+						"Fashionable Dress - Blue": 1,
+						"Fashionable Dress - Green": 1,
+						"Fashionable Dress - Pink": 1,
+						"Fashionable Dress - Purple": 1,
+						"Fashionable Dress - Red": 1,
+						"Fashionable Dress - Yellow": 1,
+						"Stylin' Dress - Blue": 1,
+						"Stylin' Dress - Green": 1,
+						"Stylin' Dress - Pink": 1,
+						"Stylin' Dress - Purple": 1,
+						"Stylin' Dress - Red": 1,
+						"Stylin' Dress - Yellow": 1,
+						"Fashion Purse - Blue": 1,
+						"Fashion Purse - Green": 1,
+						"Fashion Purse - Pink": 1,
+						"Fashion Purse - Purple": 1,
+						"Fashion Purse - Red": 1,
+						"Fashion Purse - Yellow": 1,
+						"High Heels - Blue": 1,
+						"High Heels - Green": 1,
+						"High Heels - Pink": 1,
+						"High Heels - Purple": 1,
+						"High Heels - Red": 1,
+						"High Heels - Yellow": 1,
+					}},
+				],
+				section: "Item Packs",
 			},
 			"Sportsball Pack": {
 				cost: 15000,
+				section: "Item Packs",
 				items: {
 					"Basketball Hoop": 2,
 					"Sporty Goal": 2,
@@ -531,12 +636,22 @@
 					"Crowded Stadium": 5,
 					"Football Helmet": 1,
 					"Growies Cap": 1,
-					// TODO: 1 of 6 random sports balls
 				},
-				section: "Item Packs"
+				randomItems: [
+					{count: 1, options: {
+						"FC Cleats": 1,
+						"Man U Cleats": 1,
+						"Baseball Glove": 1,
+						"Pigskin": 1,
+						"Basketball": 1,
+						"Tennis Racquet": 1,
+					}},
+				],
+				section: "Item Packs",
 			},
 			"Fishin' Pack": {
 				cost: 10000,
+				section: "Item Packs",
 				items: {
 					"Fishing Rod": 1,
 					"Tackle Box": 1,
@@ -544,10 +659,10 @@
 					"Fish Tank Port": 1,
 					"Wiggly Worm": 5,
 				},
-				section: "Item Packs"
 			},
 			"Firefighter Pack": {
 				cost: 10000,
+				section: "Item Packs",
 				items: {
 					"Firefighter Helmet - Yellow": 1,
 					"Firefighter Pants - Yellow": 1,
@@ -556,10 +671,10 @@
 					"Fire Hose": 1,
 					"Firehouse": 1,
 				},
-				section: "Item Packs"
 			},
 			"Steampack": {
 				cost: 20000,
+				section: "Item Packs",
 				items: {
 					"Steam Tubes": 10,
 					"Steam Stompers": 2,
@@ -568,28 +683,39 @@
 					"Steam Valves": 2,
 					"Steampunk Top Hat": 1,
 				},
-				section: "Item Packs"
 			},
 			"Painter's Pack": {
 				cost: 30000,
+				section: "Item Packs",
 				items: {
 					"Paintbrush": 1,
-					// TODO: Random paints
 				},
-				section: "Item Packs"
+				randomItems: [
+					{count: 20, options: {
+						"Paint Bucket - Charcoal": 1,
+						"Paint Bucket - Red": 1,
+						"Paint Bucket - Green": 1,
+						"Paint Bucket - Purple": 1,
+						"Paint Bucket - Blue": 1,
+						"Paint Bucket - Aqua": 1,
+						"Paint Bucket - Yellow": 1,
+						"Paint Bucket - Varnish": 1,
+					}},
+				],
 			},
 			"B.O.O. Training Pack": {
 				cost: 10000,
+				section: "Item Packs",
 				items: {
 					"Spectral Goggles": 1,
 					"Neutron Gun": 1,
 					"Neutron Pack": 1,
 					"Ghost Jars": 10,
 				},
-				section: "Item Packs"
 			},
 			"Paleontologist's Kit": {
 				cost: 20000,
+				section: "Item Packs",
 				items: {
 					"Fossil Brushes": 5,
 					"Rock Hammer": 1,
@@ -597,11 +723,11 @@
 					"Blue Hardhat": 1,
 					"Fossil Prep Station": 1,
 				},
-				section: "Item Packs"
 			},
 
 			"Chemsynth Pack": {
 				cost: 10000,
+				section: "Item Packs",
 				items: {
 					"Chemsynth Processor": 1,
 					"Chemsynth Tank": 10,
@@ -611,7 +737,6 @@
 					"Chemsynth Centrifuge": 1,
 					"Chemsynth Stirrer": 1,
 				},
-				section: "Item Packs"
 			},
 		};
 
@@ -1141,11 +1266,11 @@
 				}
 					
 				if (pack.randomItems) {
-					for (var i = 0; i < pack.randomItems.length; i++) {
-						randomSet = pack.randomItems[i];
+					for (var setIndex = 0; setIndex < pack.randomItems.length; setIndex++) {
+						randomSet = pack.randomItems[setIndex];
 						var subLi = document.createElement("li");
 						var setTitle = document.createElement("em");
-						setTitle.innerText = randomSet.count + " random selections from:";
+						setTitle.innerText = randomSet.count + " random selection(s) from:";
 						subLi.appendChild(setTitle);
 
 						var subList = document.createElement("ul");
@@ -1163,6 +1288,18 @@
 							x.innerText = " x" + randomSet.options[childName];
 							li.appendChild(x);
 							subList.appendChild(li);
+
+							if (debugMode) {
+								if (!items[childName]) {
+									console.error("Pack", packName, "item not found: ", childName);
+									continue;
+								} else {
+									var item = items[childName];
+									if (item.fromStorePack != packName) {
+										console.error("Pack", packName, "item", childName, "doesn't include that pack as a source!");
+									}
+								}
+							}
 						}
 						contentsList.appendChild(subLi);
 					}

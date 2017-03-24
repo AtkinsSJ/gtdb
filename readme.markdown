@@ -19,12 +19,18 @@ I'm gradually filling in the item data. It's messy, but once I have it in a dece
 	- Image indexes
 	- Item data
 
-- Handle random items from Item Packs
-	- Also, random drops from trees. Maybe use the same system?
+- Handle random drops from trees. Maybe use the same system?
 	- Wizard Hat Seed from Fantasy Pack - similar again?
 - Items that combine when tapped on
 	- Player
 	- Inventory
 	- Special block (eg sewing machine)
-- How to earn Growtokens
-- How to earn Gems???
+- Sewing
+- Science/cooking
+- Geiger hunting
+- Carnival prizes
+- Growganoth offerings
+- Fishing
+- Silkworms
+
+- How to earn Growtokens?
