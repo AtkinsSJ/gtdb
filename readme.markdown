@@ -20,6 +20,7 @@ I'm gradually filling in the item data. It's messy, but once I have it in a dece
 	- Item data
 
 - Item types, eg "Chemical Combiner", they you can search for?
+	- Geiger hunting -> list findable items
 - Element, for crystal harmonising
 
 - Handle random drops from trees. Maybe use the same system?

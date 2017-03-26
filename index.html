@@ -924,7 +924,7 @@
 			"Zombie-Stompin' Boots": {rarity: 15, splice: ["Grimstone", "Death Spikes"], fromStorePack: "Zombie Defense Pack"},
 			// GEN VIII
 			"Acid": {rarity: 35, splice: ["Plumbing", "Cactus"]},
-			"Antidote": {rarity: 31, splice: ["Apple", "Blueberry"]},
+			"Antidote": {rarity: 31, splice: ["Apple", "Blueberry"], fromStorePack: "Zombie Defense Pack"},
 			"Backpack": {rarity: 17, splice: ["Bed", "Super Crate Box"]},
 			"Blue Star Wallpaper": {rarity: 18, splice: ["Blue Block", "Amber Glass"]},
 			"Checkered Pajamas": {rarity: 25, splice: ["Bed", "Checker Wallpaper"]},
@@ -933,20 +933,38 @@
 			"Das Red Balloon": {rarity: 18, splice: ["Bubble Wrap", "Red Block"]},
 			"Dreamstone Block": {rarity: 23, splice: ["Bed", "Orange Block"]},
 			"Granite Block": {rarity: 23, splice: ["Sandstone", "Stone Wall"]},
-			"Iron Bars": {rarity: 26, splice: ["Plumbing", "Death Spikes"]},
-			"Military Radio": {rarity: 36, splice: ["Sheet Music: Sharp Piano", "Biohazard Sign"]},
+			"Iron Bars": {rarity: 26, splice: ["Plumbing", "Death Spikes"], fromStorePack: "Dungeon Pack"},
+			"Military Radio": {rarity: 36, splice: ["Sheet Music: Sharp Piano", "Biohazard Sign"], fromStorePack: "Zombie Defense Pack"},
 			"Music Box": {rarity: 38, splice: ["Rubber Ducky", "Olde Timey Radio"]},
 			"Note Block": {rarity: 30, splice: ["Blue Block", "Olde Timey Radio"]},
 			"Peg Leg": {rarity: 29, splice: ["Rubber Ducky", "Wooden Table"]},
-			"Pitchfork": {rarity: 27, splice: ["Wrought-Iron Fence", "Crappy Sign"]},
+			"Pitchfork": {rarity: 27, splice: ["Wrought-Iron Fence", "Crappy Sign"], fromStorePack: "Farm Pack"},
 			"Purple Block": {rarity: 19, splice: ["Blue Block", "Red Block"]},
-			"Red Sweatpants": {rarity: 19, splice: ["Big Old Down Arrow", "White Block"]},
+			"Red Sweatpants": {rarity: 19, splice: ["Big Old Down Arrow", "White Block"], fromStorePack: "Racing Action Pack"},
 			"Screen Door": {rarity: 17, splice: ["Lattice Background", "Door"]},
-			"Sheet Music: Bass Note": {rarity: 24, splice: ["Blue Block", "Sheet Music: Blank"]},
+			"Sheet Music: Bass Note": {rarity: 24, splice: ["Blue Block", "Sheet Music: Blank"], fromStorePack: "Composer's Pack"},
 			"Ski Cap": {rarity: 18, splice: ["Blue Block", "Mushroom"]},
 			"Sugar Cane": {rarity: 24, splice: ["Seaweed", "Happy Joy Plaque"]},
 			"Swiss Cheese Block": {rarity: 1, splice: ["Bubble Wrap", "Pastel Yellow Block"]},
 			"Wall Like An Egyptian": {rarity: 22, splice: ["Sandstone", "Mud Glob"]},
+
+			// Geiger Counter items
+			"Radioactive Chemical": {geigerReward: "Geiger Counter"},
+			"D Battery": {geigerReward: "Geiger Counter"},
+			"Blue Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
+			"Green Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
+			"Red Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
+			"White Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
+			"Black Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
+			"Orange Stuff": {rarity: 31, geigerReward: "Geiger Counter", splice: ["Orange Block", "Coral"]},
+			"Purple Stuff": {rarity: 41, geigerReward: "Geiger Counter", splice: ["Purple Block", "Coral"]},
+			"Blue Stuff": {rarity: 36, geigerReward: "Geiger Counter"},
+			"Green Stuff": {rarity: 36, geigerReward: "Geiger Counter"},
+			"Shield Fragment": {geigerReward: "Geiger Counter", fishing: {minBait: "???"}},
+			"Nuclear Fuel": {geigerReward: "Geiger Counter"},
+			"Tree Decorations": {geigerReward: "Geiger Counter", duringEvent: "Winterfest"},
+			"Glowstick": {geigerReward: "Geiger Counter"},
+			"Ruby Shard": {geigerReward: "Geiger Counter", duringEvent: "Valentine's Week"},
 
 			// Easter Week items
 			"Magic Egg": {rarity: 1, spawnsDuringEvent: "Easter Week"},
@@ -1011,7 +1029,7 @@
 			"Spring Bouquet": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Checkered": 1, "Easter Egg - Striped": 1}}},
 			"Brainflower": {dailyChallengeReward: {challenge: "Bunny Battle", places: "all"}},
 			"Weather Machine - Spring": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1}}},
-			"Totally Legit Bunnyfish": {fish: {minBait: "Catch-of-the-Day Bait", event: "Easter Week"}},
+			"Totally Legit Bunnyfish": {fishing: {minBait: "Catch-of-the-Day Bait", duringEvent: "Easter Week"}},
 			
 			// Item of the Month
 			"Golden Razor Wings": {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}},
@@ -1261,15 +1279,20 @@
 					sourceInfo.push("Spawns in the '" + item.specialEventSpawn + "' special event.");
 				}
 				if (item.geigerReward) {
-					sourceInfo.push("Can be found when using a <a href=\"#" + makeItemLinkID(item.geigerReward) + "\">" + item.geigerReward + "</a>.");
+					var t = "Can be found when using a <a href=\"#" + makeItemLinkID(item.geigerReward) + "\">" + item.geigerReward + "</a>";
+					if (item.duringEvent) {
+						t += " during " + item.duringEvent;
+					}
+					t += ".";
+					sourceInfo.push(t);
 				}
 				if (item.villainDrop) {
 					sourceInfo.push("Is a possible reward for defeating " + item.villainDrop + " in a card battle.");
 				}
-				if (item.fish) {
-					var f = item.fish;
-					if (f.event) {
-						sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> during " + f.event + ".");
+				if (item.fishing) {
+					var f = item.fishing;
+					if (f.duringEvent) {
+						sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> during " + f.duringEvent + ".");
 					} else {
 						sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> or better.");
 					}
