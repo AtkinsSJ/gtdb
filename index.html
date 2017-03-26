@@ -85,6 +85,7 @@
 		<h1>Growtopia Item Database</h1>
 		<p>An incomplete list of every item in the game and how to get it. Hopefully there will be more features later!</p>
 		<p>And yes, I know this is SUPER UGLY. I'm a programmer not a designer. Be grateful it's not all magenta Comic Sans.</p>
+		<p><span id="introErrorCount">0</span> errors detected, and <span id="introMissingItemCount">0</span> known missing items.</p>
 	</header>
 
 	<nav class="tableOfContents box">
@@ -110,6 +111,7 @@
 	<script type="text/javascript">
 
 		var debugMode = true; // Enables various tests to check everything is valid. Can be disabled in release mode.
+		var errorCount = 0;
 		var spriteSheetWidth = 32; // How many images wide is the spritesheet?
 		var spriteWidth = 32,
 			spriteHeight = 32;
@@ -1012,33 +1014,33 @@
 			"Diamond Ring": {rarity: 141, splice: ["Golden Block", "Crystal Block"]},
 			"Disco Ball": {rarity: 45, splice: ["Boombox", "Window"]},
 			"Elvish Longbow": {rarity: 39, splice: ["Ladder", "Big Old Sideways Arrow"]},
-			"Fire Escape": {rarity: 0, splice: ["Steel Girder", "Ladder"]},
-			"Fireplace": {rarity: 0, splice: ["Golden Block", "Evil Bricks"]},
-			"Fishbowl": {rarity: 0, splice: ["Ice", "Wooden Window"]},
-			"Fishnet Stockings": {rarity: 0, splice: ["The Darkness", "Boombox"]},
-			"Flipping Coin": {rarity: 0, splice: ["Golden Block", "Sheet Music: Drums"]},
-			"Golden Sword": {rarity: 0, splice: ["Golden Block", "Picket Fence"]},
-			"Green Wallpaper": {rarity: 0, splice: ["Magic Bacon Wallpaper", "Green Block"]},
-			"Grey Wallpaper": {rarity: 0, splice: ["Magic Bacon Wallpaper", "Grey Block"]},
-			"GrowBeats Headphones": {rarity: 0, splice: ["Boombox", "Note Block"]},
-			"High Tech Block": {rarity: 0, splice: ["Robot Wants Dubstep", "Grey Block"]},
-			"High Tech Wall": {rarity: 0, splice: ["Robot Wants Dubstep", "Black Block"]},
-			"Ninja Mask": {rarity: 0, splice: ["The Darkness", "Black Block"]},
-			"Ninja Slippers": {rarity: 0, splice: ["The Darkness", "Brown Block"]},
-			"Ninja Tights": {rarity: 0, splice: ["The Darkness", "Purple Block"]},
-			"Ninja Vest": {rarity: 0, splice: ["The Darkness", "Blue Block"]},
-			"Orange Wallpaper": {rarity: 0, splice: ["Magic Bacon Wallpaper", "Orange Block"]},
-			"Pinball Sproinger": {rarity: 0, splice: ["Pinball Bumper", "Mushroom"]},
-			"Purple Wallpaper": {rarity: 0, splice: ["Magic Bacon Wallpaper", "Purple Block"]},
-			"Red Wallpaper": {rarity: 0, splice: ["Magic Bacon Wallpaper", "Red Block"]},
-			"Showgirl Top": {rarity: 0, splice: ["Ice", "Blue Star Wallpaper"]},
-			"Traffic Barricade": {rarity: 0, splice: ["Ladder", "Table Lamp"]},
-			"Treasure Chest": {rarity: 0, splice: ["Golden Block", "Dresser"]},
-			"Venus Guytrap": {rarity: 0, splice: ["Magic Bacon Wallpaper", "Daisy"]},
-			"Wizard Hat": {rarity: 0, splice: ["Bookcase", "Dreamstone Block"]},
-			"Yellow Wallpaper": {rarity: 0, splice: ["Magic Bacon Wallpaper", "Yellow Block"]},
+			"Fire Escape": {rarity: 76, splice: ["Steel Girder", "Ladder"]},
+			"Fireplace": {rarity: 46, splice: ["Golden Block", "Evil Bricks"]},
+			"Fishbowl": {rarity: 40, splice: ["Ice", "Wooden Window"]},
+			"Fishnet Stockings": {rarity: 79, splice: ["The Darkness", "Boombox"]},
+			"Flipping Coin": {rarity: 54, splice: ["Golden Block", "Sheet Music: Drums"]},
+			"Golden Sword": {rarity: 58, splice: ["Golden Block", "Picket Fence"]},
+			"Green Wallpaper": {rarity: 43, splice: ["Magic Bacon Wallpaper", "Green Block"]},
+			"Grey Wallpaper": {rarity: 42, splice: ["Magic Bacon Wallpaper", "Grey Block"]},
+			"GrowBeats Headphones": {rarity: 69, splice: ["Boombox", "Note Block"]},
+			"High Tech Block": {rarity: 69, splice: ["Robot Wants Dubstep", "Grey Block"]},
+			"High Tech Wall": {rarity: 69, splice: ["Robot Wants Dubstep", "Black Block"]},
+			"Ninja Mask": {rarity: 44, splice: ["The Darkness", "Black Block"]},
+			"Ninja Slippers": {rarity: 44, splice: ["The Darkness", "Brown Block"]},
+			"Ninja Tights": {rarity: 59, splice: ["The Darkness", "Purple Block"]},
+			"Ninja Vest": {rarity: 55, splice: ["The Darkness", "Blue Block"]},
+			"Orange Wallpaper": {rarity: 47, splice: ["Magic Bacon Wallpaper", "Orange Block"]},
+			"Pinball Sproinger": {rarity: 56, splice: ["Pinball Bumper", "Mushroom"]},
+			"Purple Wallpaper": {rarity: 57, splice: ["Magic Bacon Wallpaper", "Purple Block"]},
+			"Red Wallpaper": {rarity: 42, splice: ["Magic Bacon Wallpaper", "Red Block"]},
+			"Showgirl Top": {rarity: 48, splice: ["Ice", "Blue Star Wallpaper"]},
+			"Traffic Barricade": {rarity: 50, splice: ["Ladder", "Table Lamp"]},
+			"Treasure Chest": {rarity: 55, splice: ["Golden Block", "Dresser"]},
+			"Venus Guytrap": {rarity: 41, splice: ["Magic Bacon Wallpaper", "Daisy"]},
+			"Wizard Hat": {rarity: 65, splice: ["Bookcase", "Dreamstone Block"]},
+			"Yellow Wallpaper": {rarity: 44, splice: ["Magic Bacon Wallpaper", "Yellow Block"]},
 
-			"": {rarity: 0, splice: ["Block", "Block"]},
+			// "": {rarity: 0, splice: ["Block", "Block"]},
 
 			// Geiger Counter items
 			"Radioactive Chemical": {geigerReward: "Geiger Counter"},
@@ -1249,8 +1251,10 @@
 			return children;
 		}
 
-		var error = function(){};
-		if (debugMode) error = console.error;
+		var error = function() {
+			errorCount++;
+			if (debugMode) console.error.apply(null, arguments);
+		}
 
 		// Items
 		var itemsList = document.getElementById("itemsList");
@@ -1297,7 +1301,7 @@
 
 				if (item.hasOwnProperty("rarity")) {
 					if (item.rarity === 0) {
-						error("Item rarity missing for", itemName);
+						// error("Item rarity missing for", itemName);
 					} else {
 						var rarity = document.createElement("div");
 						rarity.innerText = "Rarity: " + item.rarity;
@@ -1643,10 +1647,17 @@
 			// TOC
 			{
 				var li = document.createElement("li");
-				li.innerText = missingItemName;
+				var a = document.createElement("a");
+				a.innerText = missingItemName;
+				a.href = makeWikiLink(missingItemName);
+				a.target = "_blank";
+				li.appendChild(a);
 				missingItemsList.appendChild(li);
 			}
 		}
+
+		document.getElementById("introMissingItemCount").innerText = missingItemNames.length;
+		document.getElementById("introErrorCount").innerText = errorCount;
 	</script>
 </body>
 </html>
