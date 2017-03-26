@@ -1107,8 +1107,39 @@
 			"Scoreboard": {rarity: 91, splice: ["Bulletin Board", "Table Lamp"]},
 			"Tavern Sign": {rarity: 85, splice: ["Art Deco Block", "Sign"], fromStorePack: "Fantasy Pack"},
 
-			// Geiger Counter items
+			// Chemicals
+			"Chemical G": {rarity: 1, fromProvider: "Science Station"},
+			"Chemical R": {rarity: 10, fromProvider: "Science Station"},
+			"Chemical Y": {rarity: 15, fromProvider: "Science Station"},
+			"Chemical B": {rarity: 25, fromProvider: "Science Station"},
+			"Chemical P": {rarity: 50, fromProvider: "Science Station"},
+			"Mysterious Chemical": {rarity: 90, chemicalCombine: {count: 1, ingredients: {"Chemical Y": 20, "Chemical B": 10, "Chemical P": 5}}},
+			"Haunted Chemical": {fromGrowganoth: ["Chemical G", "Chemical R", "Chemical Y", "Chemical B", "Chemical P"]},
+			"Unearthly Chemical": {rarity: 59, availableDuringEvent: "Night Of The Comet", splice: ["Starseed", "Glowy Block"]},
 			"Radioactive Chemical": {geigerReward: "Geiger Counter"},
+			"Synthetic Chemical": {minigameReward: "Chemsynth"},
+			
+			"Combover": {rarity: 26, chemicalCombine: {count: 1, ingredients: {"Chemical G": 5, "Chemical R": 5, "Chemical Y": 10}}},
+			"Shocking Hair": {rarity: 36, chemicalCombine: {count: 1, ingredients: {"Chemical G": 30, "Chemical R": 4, "Chemical B": 1}}},
+			"Shockinator": {rarity: 61, chemicalCombine: {count: 3, ingredients: {"Chemical G": 10, "Chemical R": 5, "Chemical P": 1}}},
+			"Steel Table": {rarity: 41, chemicalCombine: {count: 5, ingredients: {"Chemical G": 5, "Chemical Y": 4, "Chemical B": 2}}},
+			"Dragon Tail": {rarity: 66, chemicalCombine: {count: 1, ingredients: {"Chemical G": 6, "Chemical Y": 3, "Chemical P": 4}}},
+			"Slime": {rarity: 76, chemicalCombine: {count: 4, ingredients: {"Chemical G": 15, "Chemical B": 4, "Chemical P": 2}}},
+			"Glowing Nose": {rarity: 50, availableDuringEvent: "Winterfest", chemicalCombine: {count: 1, ingredients: {"Chemical R": 10, "Chemical Y": 12, "Chemical B": 4}}},
+			"Lab Coat": {rarity: 75, chemicalCombine: {count: 1, ingredients: {"Chemical R": 10, "Chemical Y": 3, "Chemical P": 3}}},
+			"Ze Goggles": {rarity: 85, chemicalCombine: {count: 1, ingredients: {"Chemical R": 4, "Chemical B": 2, "Chemical P": 3}}},
+			"Forcefield": {rarity: 101, chemicalCombine: {count: 1, ingredients: {"Chemical G": 20, "Chemical R": 10, "Mysterious Chemical": 1}}},
+			// "": {rarity: 0, chemicalCombine: {count: 1, ingredients: {"Chemical G": 0, "Chemical Y": 0, "Mysterious Chemical": 0}}},
+			"Fuel Pack": {rarity: 116, chemicalCombine: {count: 5, ingredients: {"Chemical G": 10, "Chemical B": 2, "Mysterious Chemical": 1}}},
+			"Battle Trout": {rarity: 141, chemicalCombine: {count: 1, ingredients: {"Chemical G": 20, "Chemical P": 15, "Mysterious Chemical": 10}}},
+			"Sassy Boots": {rarity: 115, chemicalCombine: {count: 1, ingredients: {"Chemical R": 8, "Chemical Y": 4, "Mysterious Chemical": 1}}},
+			// "": {rarity: 0, chemicalCombine: {count: 1, ingredients: {"Chemical R": 0, "Chemical B": 0, "Mysterious Chemical": 0}}},
+			"Block Glue": {chemicalCombine: {count: 2, ingredients: {"Chemical R": 1, "Chemical P": 1, "Mysterious Chemical": 1}}},
+			"Enhanced Intellect": {rarity: 130, chemicalCombine: {count: 1, ingredients: {"Chemical Y": 3, "Chemical B": 3, "Mysterious Chemical": 3}}},
+			"Thingamajig": {rarity: 155, chemicalCombine: {count: 1, ingredients: {"Chemical Y": 4, "Chemical P": 3, "Mysterious Chemical": 1}}},
+			"Reanimator Remote": {rarity: 200, chemicalCombine: {count: 1, ingredients: {"Chemical B": 200, "Chemical P": 200, "Mysterious Chemical": 200}}},
+
+			// Geiger Counter items
 			"D Battery": {geigerReward: "Geiger Counter"},
 			"Blue Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
 			"Green Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
@@ -1121,9 +1152,9 @@
 			"Green Stuff": {rarity: 36, geigerReward: "Geiger Counter"},
 			"Shield Fragment": {geigerReward: "Geiger Counter", fishing: {minBait: "???"}},
 			"Nuclear Fuel": {geigerReward: "Geiger Counter"},
-			"Tree Decorations": {geigerReward: "Geiger Counter", duringEvent: "Winterfest"},
+			"Tree Decorations": {geigerReward: "Geiger Counter", availableDuringEvent: "Winterfest"},
 			"Glowstick": {geigerReward: "Geiger Counter"},
-			"Ruby Shard": {geigerReward: "Geiger Counter", duringEvent: "Valentine's Week"},
+			"Ruby Shard": {geigerReward: "Geiger Counter", availableDuringEvent: "Valentine's Week"},
 
 			// Easter Week items
 			"Magic Egg": {rarity: 1, spawnsDuringEvent: "Easter Week"},
@@ -1188,7 +1219,7 @@
 			"Spring Bouquet": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Checkered": 1, "Easter Egg - Striped": 1}}},
 			"Brainflower": {dailyChallengeReward: {challenge: "Bunny Battle", places: "all"}},
 			"Weather Machine - Spring": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1}}},
-			"Totally Legit Bunnyfish": {fishing: {minBait: "Catch-of-the-Day Bait", duringEvent: "Easter Week"}},
+			"Totally Legit Bunnyfish": {fishing: {minBait: "Catch-of-the-Day Bait"}, availableDuringEvent: "Easter Week"},
 			
 			// Item of the Month
 			"Golden Razor Wings": {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}},
@@ -1311,14 +1342,30 @@
 
 				var item = items[itemName];
 				if (item.splice && item.splice.includes(parentItem)) children.push(itemName);
+				else if (item.chemicalCombine && item.chemicalCombine.ingredients.hasOwnProperty(parentItem)) children.push(itemName);
 			}
 
 			return children;
 		}
+		function packHasItem(pack, itemName) {
+			var hasItem = false;
+			var seedName = itemName + " Seed";
+			if (pack.items) {
+				if (pack.items.hasOwnProperty(itemName)) hasItem = true;
+				if (pack.items.hasOwnProperty(seedName)) hasItem = true;
+			}
+			if (pack.randomItems) {
+				for (var setIndex in pack.randomItems) {
+					if (pack.randomItems[setIndex].options.hasOwnProperty(itemName)) hasItem = true;
+					if (pack.randomItems[setIndex].options.hasOwnProperty(seedName)) hasItem = true;
+				}
+			}
+			return hasItem;
+		};
 
 		var error = function() {
 			errorCount++;
-			if (debugMode) console.error.apply(null, arguments);
+			if (debugMode) console.error.apply(this, arguments);
 		}
 
 		// Items
@@ -1376,6 +1423,10 @@
 
 				var source = document.createElement("p");
 				var sourceInfo = [];
+
+				if (item.availableDuringEvent) {
+					sourceInfo.push("<em>This item can only be created during " + item.availableDuringEvent + ".</em>");
+				}
 				if (item.splice) {
 					var parent1 = items[item.splice[0]];
 					var parent2 = items[item.splice[1]];
@@ -1383,18 +1434,18 @@
 					if (!parent1) {
 						error("Item", itemName, "parent item not found: ", item.splice[0]);
 						missingItemNames.push(item.splice[0]);
-						continue;
 					}
 					if (!parent2) {
 						error("Item", itemName, "parent item not found: ", item.splice[1]);
 						missingItemNames.push(item.splice[1]);
-						continue;
 					}
 
 					// Check the rarities match!
-					var targetRarity = parent1.rarity + parent2.rarity;
-					if (item.rarity != targetRarity) {
-						error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
+					if (parent1 && parent2) {
+						var targetRarity = parent1.rarity + parent2.rarity;
+						if (item.rarity != targetRarity) {
+							error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
+						}
 					}
 
 					sourceInfo.push("Splice a "
@@ -1444,43 +1495,19 @@
 					sourceInfo.push("Spawns in the '" + item.specialEventSpawn + "' special event.");
 				}
 				if (item.geigerReward) {
-					var t = "Can be found when using a <a href=\"#" + makeItemLinkID(item.geigerReward) + "\">" + item.geigerReward + "</a>";
-					if (item.duringEvent) {
-						t += " during " + item.duringEvent;
-					}
-					t += ".";
-					sourceInfo.push(t);
+					sourceInfo.push("Can be found when using a <a href=\"#" + makeItemLinkID(item.geigerReward) + "\">" + item.geigerReward + "</a>.");
 				}
 				if (item.villainDrop) {
 					sourceInfo.push("Is a possible reward for defeating " + item.villainDrop + " in a card battle.");
 				}
 				if (item.fishing) {
 					var f = item.fishing;
-					if (f.duringEvent) {
-						sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> during " + f.duringEvent + ".");
-					} else {
-						sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> or better.");
-					}
+					sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> or better.");
 				}
 				if (item.fromGemsPack) {
 					sourceInfo.push("Get " + item.fromGemsPack.count + " when buying the " + item.fromGemsPack.name + " package from the Store.");
 				}
 				if (item.fromStorePack) {
-					var packHasItem = function(pack, itemName) {
-						var hasItem = false;
-						var seedName = itemName + " Seed";
-						if (pack.items) {
-							if (pack.items.hasOwnProperty(itemName)) hasItem = true;
-							if (pack.items.hasOwnProperty(seedName)) hasItem = true;
-						}
-						if (pack.randomItems) {
-							for (var setIndex in pack.randomItems) {
-								if (pack.randomItems[setIndex].options.hasOwnProperty(itemName)) hasItem = true;
-								if (pack.randomItems[setIndex].options.hasOwnProperty(seedName)) hasItem = true;
-							}
-						}
-						return hasItem;
-					};
 					if (!packs.hasOwnProperty(item.fromStorePack)) {
 						error("Item ", itemName, " refers to missing store pack \"", item.fromStorePack, "\"");
 					} else {
