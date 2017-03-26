@@ -1220,8 +1220,8 @@
 		var missingItemNames = [];
 
 		function makeItemLinkID(name) {
-			var regex = /\s/g;
-			return name.replace(regex, "_");
+			return name.replace(/\sseed$/i, "")
+						.replace(/\s/g, "_");
 		}
 		function makePackLinkID(name) {
 			var regex = /(pack|kit)/i;
@@ -1332,7 +1332,7 @@
 						error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
 					}
 
-					sourceInfo.push("Plant a " + itemName + " seed, or splice a "
+					sourceInfo.push("Splice a "
 					+ "<a href=\"#" + makeItemLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
 					+ "<a href=\"#" + makeItemLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.");
 				}
@@ -1554,6 +1554,10 @@
 				// Where is this used?
 				// This is a really really dumb check right now.
 				// Probably makes more sense to put everything in a DB on a server rather than here, but oh well.
+
+				function getItemSafeName(itemName) {
+					return itemName.replace(/\sseed$/i, "");
+				}
 				
 				var contents = document.createElement("h3");
 				contents.innerText = "Contents:";
@@ -1563,14 +1567,15 @@
 					var contentNames = Object.keys(pack.items);
 					for (var i = 0; i < contentNames.length; i++) {
 						var childName = contentNames[i];
+						var itemSafeName = getItemSafeName(childName);
 
-						if (!items[childName]) {
-							error("Pack", packName, "item not found: ", childName);
-							missingItemNames.push(childName);
+						if (!items[itemSafeName]) {
+							error("Pack", packName, "item not found: ", itemSafeName);
+							missingItemNames.push(itemSafeName);
 						} else {
-							var item = items[childName];
+							var item = items[itemSafeName];
 							if (item.fromStorePack != packName) {
-								error("Pack", packName, "item", childName, "doesn't include that pack as a source!");
+								error("Pack", packName, "item", itemSafeName, "doesn't include that pack as a source!");
 							}
 						}
 
