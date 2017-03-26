@@ -19,6 +19,9 @@ I'm gradually filling in the item data. It's messy, but once I have it in a dece
 	- Image indexes
 	- Item data
 
+- Item types, eg "Chemical Combiner", they you can search for?
+- Element, for crystal harmonising
+
 - Handle random drops from trees. Maybe use the same system?
 	- Wizard Hat Seed from Fantasy Pack - similar again?
 - Items that combine when tapped on
