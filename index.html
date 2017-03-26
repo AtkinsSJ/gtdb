@@ -753,7 +753,7 @@
 			"Cave Background": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 7},
 			"Rock": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 5},
 			"Lava": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 2},
-			"Crystal Block": {rarity: 100, spawnsInEvent: "Beautiful Crystal"},
+			"Crystal Block": {rarity: 100, specialEventSpawn: "Beautiful Crystal"},
 			"Sand": {rarity: 1, spawnsInWorlds: ["Beach Blast"]},
 			"Ocean Rock": {rarity: 1, spawnsInWorlds: ["Beach Blast", "Undersea Blast"]},
 			"Garbage": {rarity: 1},
@@ -857,7 +857,7 @@
 			"Bathtub": {rarity: 13, splice: ["Toilet", "White Block"]},
 			"Big Old Sideways Arrow": {rarity: 13, splice: ["Orange Block", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
 			"Biohazard Sign": {rarity: 14, splice: ["Orange Block", "Danger Sign"], fromStorePack: "Zombie Defense Pack"},
-			"Blueberry Bush": {rarity: 12, splice: ["Bush", "Mushroom"]},
+			"Blueberry": {rarity: 12, splice: ["Bush", "Mushroom"]},
 			"Briefcase": {rarity: 14, splice: ["Stripey Wallpaper", "Brown Block"]},
 			"Burglar Mask": {rarity: 8, splice: ["Brick Background", "Cave Background"]},
 			"Cactus": {rarity: 17, splice: ["Death Spikes", "Bush"]},
@@ -889,17 +889,17 @@
 			"Wooden Chair": {rarity: 11, splice: ["Toilet", "Wooden Platform"]},
 			// GEN VII
 			"Ancient Stone Gate": {rarity: 17, splice: ["Portcullis", "Sandstone Wall"]},
-			"Apple": {rarity: 11, splice: ["Blueberry", "Red Bricks"], fromStorePack: "Education Pack"},
+			"Apple": {rarity: 19, splice: ["Blueberry", "Red Bricks"], fromStorePack: "Education Pack"},
 			"Barky's Mask": {rarity: 21, splice: ["Barrel", "Painting: Yerfdog"]},
 			"Baseball Bat": {rarity: 12, splice: ["House Entrance", "Sign"]},
 			"Bed": {rarity: 14, splice: ["Wooden Chair", "Mushroom"]},
 			"Big Old Down Arrow": {rarity: 13, splice: ["Devil Horns", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
-			"Blue Block": {rarity: 11, splice: ["Blueberry", "Bricks"]},
+			"Blue Block": {rarity: 15, splice: ["Blueberry", "Bricks"]},
 			"Brainwave Capacitor": {rarity: 21, splice: ["Olde Timey Radio", "Yellow Block"]},
-			"Bubble Wrap": {rarity: 11, splice: ["Blueberry", "Glass Pane"]},
+			"Bubble Wrap": {rarity: 14, splice: ["Blueberry", "Glass Pane"]},
 			"Gargoyle": {rarity: 16, splice: ["Grimstone", "Devil Horns"]},
 			"Grey Hair Bun": {rarity: 19, splice: ["Olde Timey Radio", "Grey Block"]},
-			"Just One Boxing Glove": {rarity: 11, splice: ["Blueberry", "Red Block"]},
+			"Just One Boxing Glove": {rarity: 16, splice: ["Blueberry", "Red Block"]},
 			"Lattice Background": {rarity: 15, splice: ["Wooden Chair", "Wooden Background"]},
 			"Long Black Hair": {rarity: 20, splice: ["Portcullis", "Black Block"]},
 			"Monster Feet": {rarity: 14, splice: ["Devil Horns", "Green Block"]},
@@ -922,7 +922,97 @@
 			"TV Head": {rarity: 17, splice: ["Olde Timey Radio", "Wood Block"]},
 			"Wrought-Iron Fence": {rarity: 24, splice: ["Portcullis", "Pencil"]},
 			"Zombie-Stompin' Boots": {rarity: 15, splice: ["Grimstone", "Death Spikes"], fromStorePack: "Zombie Defense Pack"},
-		
+			// GEN VIII
+			"Acid": {rarity: 35, splice: ["Plumbing", "Cactus"]},
+			"Antidote": {rarity: 31, splice: ["Apple", "Blueberry"]},
+			"Backpack": {rarity: 17, splice: ["Bed", "Super Crate Box"]},
+			"Blue Star Wallpaper": {rarity: 18, splice: ["Blue Block", "Amber Glass"]},
+			"Checkered Pajamas": {rarity: 25, splice: ["Bed", "Checker Wallpaper"]},
+			"Copper Plumbing": {rarity: 27, splice: ["Plumbing", "Orange Block"]},
+			"Coral": {rarity: 22, splice: ["Seaweed", "Ocean Rock"]},
+			"Das Red Balloon": {rarity: 18, splice: ["Bubble Wrap", "Red Block"]},
+			"Dreamstone Block": {rarity: 23, splice: ["Bed", "Orange Block"]},
+			"Granite Block": {rarity: 23, splice: ["Sandstone", "Stone Wall"]},
+			"Iron Bars": {rarity: 26, splice: ["Plumbing", "Death Spikes"]},
+			"Military Radio": {rarity: 36, splice: ["Sheet Music: Sharp Piano", "Biohazard Sign"]},
+			"Music Box": {rarity: 38, splice: ["Rubber Ducky", "Olde Timey Radio"]},
+			"Note Block": {rarity: 30, splice: ["Blue Block", "Olde Timey Radio"]},
+			"Peg Leg": {rarity: 29, splice: ["Rubber Ducky", "Wooden Table"]},
+			"Pitchfork": {rarity: 27, splice: ["Wrought-Iron Fence", "Crappy Sign"]},
+			"Purple Block": {rarity: 19, splice: ["Blue Block", "Red Block"]},
+			"Red Sweatpants": {rarity: 19, splice: ["Big Old Down Arrow", "White Block"]},
+			"Screen Door": {rarity: 17, splice: ["Lattice Background", "Door"]},
+			"Sheet Music: Bass Note": {rarity: 24, splice: ["Blue Block", "Sheet Music: Blank"]},
+			"Ski Cap": {rarity: 18, splice: ["Blue Block", "Mushroom"]},
+			"Sugar Cane": {rarity: 24, splice: ["Seaweed", "Happy Joy Plaque"]},
+			"Swiss Cheese Block": {rarity: 1, splice: ["Bubble Wrap", "Pastel Yellow Block"]},
+			"Wall Like An Egyptian": {rarity: 22, splice: ["Sandstone", "Mud Glob"]},
+
+			// Easter Week items
+			"Magic Egg": {rarity: 1, spawnsDuringEvent: "Easter Week"},
+			"Bunny Ears": {rarity: 16, splice: ["Magic Egg", "Polka Dot Block"]},
+			"Bunny Mask": {rarity: 8, splice: ["Magic Egg", "Flowery Wallpaper"]},
+			"Bunny Tail": {rarity: 10, splice: ["Magic Egg", "Bush"]},
+			"Wicker Basket": {rarity: 16, splice: ["Magic Egg", "Lattice Background"]},
+			"Pastel Suit": {rarity: 11, splice: ["Magic Egg", "Painting: Dink Duck"]},
+			"Pastel Pants": {rarity: 4, splice: ["Magic Egg", "Daisy"]},
+			"Hippie Sandals": {rarity: 23, splice: ["Magic Egg", "Wall Like An Egyptian"]},
+			"Rotten Egg": {rarity: 6, splice: ["Magic Egg", "Magic Bricks"]},
+			"Cuddly Bunny": {rarity: 41, splice: ["Magic Egg", "Fishbowl"]},
+			"Psychotic Bunny": {rarity: 41, splice: ["Magic Egg", "Fishbowl"]},
+			"Pastel Pink Block": {rarity: 1, splice: ["Magic Egg", "Red Block"]},
+			"Pastel Orange Block": {rarity: 1, splice: ["Magic Egg", "Orange Block"]},
+			"Pastel Yellow Block": {rarity: 1, splice: ["Magic Egg", "Yellow Block"]},
+			"Pastel Green Block": {rarity: 1, splice: ["Magic Egg", "Green Block"]},
+			"Pastel Aqua Block": {rarity: 1, splice: ["Magic Egg", "Aqua Block"]},
+			"Pastel Blue Block": {rarity: 1, splice: ["Magic Egg", "Blue Block"]},
+			"Pastel Purple Block": {rarity: 1, splice: ["Magic Egg", "Purple Block"]},
+			"Pastel Pink Flower Block": {rarity: 1, splice: ["Magic Egg", "Pastel Pink Block"]},
+			"Pastel Orange Flower Block": {rarity: 1, splice: ["Magic Egg", "Pastel Orange Block"]},
+			"Pastel Yellow Flower Block": {rarity: 1, splice: ["Magic Egg", "Pastel Yellow Block"]},
+			"Pastel Green Flower Block": {rarity: 1, splice: ["Magic Egg", "Pastel Green Block"]},
+			"Pastel Aqua Flower Block": {rarity: 1, splice: ["Magic Egg", "Pastel Aqua Block"]},
+			"Pastel Blue Flower Block": {rarity: 1, splice: ["Magic Egg", "Pastel Blue Block"]},
+			"Pastel Purple Flower Block": {rarity: 1, splice: ["Magic Egg", "Pastel Purple Block"]},
+			"Easter Bonnet": {breakBunnyEgg: {min: 40, max: 49}},
+			"Egg-Hunting Basket": {breakBunnyEgg: {min: 80, max: 89}},
+			"Bubble Wings": {breakBunnyEgg: {min: 90, max: 99}},
+			"Pet Bunny": {breakBunnyEgg: {min: 100, max: 100}},
+			"Easter Egg - Polka Dots": {geigerReward: "Egg-Hunting Basket"},
+			"Easter Egg - Jagged": {geigerReward: "Egg-Hunting Basket"},
+			"Easter Egg - Wavey": {geigerReward: "Egg-Hunting Basket"},
+			"Easter Egg - Checkered": {geigerReward: "Egg-Hunting Basket"},
+			"Easter Egg - Striped": {geigerReward: "Egg-Hunting Basket"},
+			"Easter Egg - Rainbow": {geigerReward: "Egg-Hunting Basket"},
+			"Pastel Pink Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 1}}},
+			"Pastel Orange Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Wavey": 1}}},
+			"Pastel Yellow Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Checkered": 1}}},
+			"Pastel Green Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Wavey": 1}}},
+			"Pastel Aqua Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}},
+			"Pastel Blue Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Wavey": 1, "Easter Egg - Checkered": 1}}},
+			"Pastel Purple Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Polka Dots": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}},
+			"Chocolate Block": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Wavey": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}},
+			"Dark Chocolate Block": {rarity: 50, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1, "Easter Egg - Rainbow": 1}}},
+			"Bouncy Bunny": {rarity: 1, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Checkered": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 1}}},
+			"Happy Flower Grass": {rarity: 1, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Checkered": 1, "Easter Egg - Wavey": 1, "Easter Egg - Polka Dots": 1}}},
+			"Cursed Jet Engine": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Jagged": 1, "Easter Egg - Wavey": 1, "Easter Egg - Rainbow": 1}}},
+			"Egghead": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Jagged": 1, "Easter Egg - Striped": 1}}},
+			"Marshmallow Basket": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 6}}},
+			"Baby Bunny": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Wavey": 10, "Easter Egg - Checkered": 10, "Easter Egg - Polka Rainbow": 10}}},
+			"Crimefighter Mask - Pink": {villainDrop: "Bunny Barko"},
+			"Muscle Shirt - Pink": {villainDrop: "Bunny Barko"},
+			"Super Tights - Pink": {villainDrop: "Bunny Barko"},
+			"Super Cape - Pink": {villainDrop: "Bunny Barko"},
+			"Super Logo - Bunny": {villainDrop: "Bunny Barko"},
+			"Dark Bunny Mask": {villainDrop: "Bunny Barko"},
+			"Villain Portrait - Bunny Barko": {villainDrop: "Bunny Barko"},
+			"Riding Bumblebee": {store: {availableDuringEvent: "Easter Week", cost: 150000}},
+			"Spring Crown": {rarity: 52, splice: ["Magic Egg", "Golden Halo"]},
+			"Spring Bouquet": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Checkered": 1, "Easter Egg - Striped": 1}}},
+			"Brainflower": {dailyChallengeReward: {challenge: "Bunny Battle", places: "all"}},
+			"Weather Machine - Spring": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1}}},
+			"Totally Legit Bunnyfish": {fish: {minBait: "Catch-of-the-Day Bait", event: "Easter Week"}},
+			
 			// Item of the Month
 			"Golden Razor Wings": {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}},
 
@@ -1128,6 +1218,15 @@
 					+ "<a href=\"#" + makeItemLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
 					+ "<a href=\"#" + makeItemLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.");
 				}
+				if (item.chemicalCombine) {
+					var c = item.chemicalCombine;
+					var ingredients = Object.keys(c.ingredients);
+					sourceInfo.push("Make " + c.count + " by combining "
+						+ c.ingredients[ingredients[0]] + " <a href=\"#" + makeItemLinkID(ingredients[0]) + "\">" + ingredients[0] + "</a>, "
+						+ c.ingredients[ingredients[1]] + " <a href=\"#" + makeItemLinkID(ingredients[1]) + "\">" + ingredients[1] + "</a> and "
+						+ c.ingredients[ingredients[2]] + " <a href=\"#" + makeItemLinkID(ingredients[2]) + "\">" + ingredients[2] + "</a> "
+						+ "in any Chemical Combiner.");
+				}
 				if (item.spawnsInWorlds) {
 					if (item.spawnsInWorlds.length == 1 && item.spawnsInWorlds[0] == "normal") {
 						sourceInfo.push("Spawns naturally in new worlds.");
@@ -1155,8 +1254,25 @@
 						sourceInfo.push(t);
 					}
 				}
-				if (item.spawnsInEvent) {
-					sourceInfo.push("Spawns in the '" + item.spawnsInEvent + "' special event.");
+				if (item.spawnsDuringEvent) {
+					sourceInfo.push("Spawns in active worlds during " + item.spawnsDuringEvent + ".");
+				}
+				if (item.specialEventSpawn) {
+					sourceInfo.push("Spawns in the '" + item.specialEventSpawn + "' special event.");
+				}
+				if (item.geigerReward) {
+					sourceInfo.push("Can be found when using a <a href=\"#" + makeItemLinkID(item.geigerReward) + "\">" + item.geigerReward + "</a>.");
+				}
+				if (item.villainDrop) {
+					sourceInfo.push("Is a possible reward for defeating " + item.villainDrop + " in a card battle.");
+				}
+				if (item.fish) {
+					var f = item.fish;
+					if (f.event) {
+						sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> during " + f.event + ".");
+					} else {
+						sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> or better.");
+					}
 				}
 				if (item.fromGemsPack) {
 					sourceInfo.push("Get " + item.fromGemsPack.count + " when buying the " + item.fromGemsPack.name + " package from the Store.");
@@ -1204,6 +1320,13 @@
 				if (item.rareWhenHarvesting) {
 					sourceInfo.push("Is a rare drop when harvesting <a href=\"#" + makeItemLinkID(item.rareWhenHarvesting) + "\">" + item.rareWhenHarvesting + "</a> trees.");
 				}
+				if (item.breakBunnyEgg) {
+					if (item.breakBunnyEgg.min == item.breakBunnyEgg.max) {
+						sourceInfo.push("Obtained by breaking a Bunny Egg at " + item.breakBunnyEgg.min + " size.");
+					} else {
+						sourceInfo.push("Obtained by breaking a Bunny Egg at " + item.breakBunnyEgg.min + " to " + item.breakBunnyEgg.max + " size.");
+					}
+				}
 				if (item.itemOfTheMonth) {
 					sourceInfo.push("Was the <a href=\"https://growtopiagame.com/itemomonth.php\" target=\"_blank\">Item of the Month</a> in " + item.itemOfTheMonth.month + " " + item.itemOfTheMonth.year + ", available in the Store for " + item.itemOfTheMonth.cost + " gems.");
 				}
@@ -1216,6 +1339,15 @@
 				if (item.competitionPrize) {
 					sourceInfo.push("Is a prize for winning " + item.competitionPrize
 						+ ". <a href=\"" + item.competitionURL + "\" target=\"_blank\">Enter here</a>");
+				}
+				if (item.dailyChallengeReward) {
+					var dc = item.dailyChallengeReward;
+					switch (dc.places) {
+						case "all": sourceInfo.push("Is a prize for being in the top 3 in the " + dc.challenge + " daily challenge."); break;
+						case 1: sourceInfo.push("Is a prize for getting 1st Place in the " + dc.challenge + " daily challenge."); break;
+						case 2: sourceInfo.push("Is a prize for getting 2nd Place in the " + dc.challenge + " daily challenge."); break;
+						case 3: sourceInfo.push("Is a prize for getting 3rd Place in the " + dc.challenge + " daily challenge."); break;
+					}
 				}
 				source.innerHTML = sourceInfo.join("<br/>");
 				infoBox.appendChild(source);
