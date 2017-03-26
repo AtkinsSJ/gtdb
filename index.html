@@ -975,7 +975,30 @@
 			"Toxic Waste Barrel": {rarity: 46, splice: ["Acid", "Barrel"], fromStorePack: "Zombie Defense Pack"},
 			"Velvet Rope": {rarity: 40, splice: ["Copper Plumbing", "Big Old Sideways Arrow"]},
 			// GEN X
-			// "Big Old Up Arrow": {rarity: 22, splice: ["Das Red Balloon", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
+			"Blue Wristband": {rarity: 34, splice: ["Race Start Flag", "Blueberry"]},
+			"Bookcase": {rarity: 42, splice: ["Rainbow Block", "Dresser"]},
+			"Boombox": {rarity: 39, splice: ["Steel Block", "Black Block"]},
+			"Checkpoint": {rarity: 42, splice: ["Cloudstone Block", "Bubble Wrap"]},
+			"Clouds": {rarity: 35, splice: ["Cloudstone Block", "Glass Block"]},
+			"Farmgirl Hair": {rarity: 46, splice: ["Velvet Rope", "Poppy"]},
+			"Golden Block": {rarity: 41, splice: ["Steel Block", "Yellow Block"]},
+			"Growsaber": {rarity: 126, splice: ["Neon Lights", "Crystal Block"]},
+			"Ice": {rarity: 30, splice: ["Cloudstone Block", "Glass Pane"]},
+			"Jetpack": {rarity: 36, splice: ["Steel Block", "Lava"]},
+			"Ladder": {rarity: 26, splice: ["Big Old Up Arrow", "Wooden Platform"]},
+			"Magic Bacon Wallpaper": {rarity: 38, splice: ["Rainbow Block", "House Entrance"]},
+			"Mailbox": {rarity: 57, splice: ["Steel Block", "Big Old Up Arrow"]},
+			"Password Door": {rarity: 77, splice: ["Jail Door", "Steel Block"]},
+			"Pinball Bumper": {rarity: 53, splice: ["Steel Block", "Blue Star Wallpaper"]},
+			"Plate Mail": {rarity: 51, splice: ["Steel Block", "Portcullis"]},
+			"Race End Flag": {rarity: 33, splice: ["Race Start Flag", "Checker Wallpaper"]},
+			"Red Sportsball Jersey": {rarity: 28, splice: ["Big Old Up Arrow", "White Block"]},
+			"Robot Wants Dubstep": {rarity: 65, splice: ["Steel Block", "Note Block"]},
+			"Roulette Wheel": {rarity: 51, splice: ["Card Block", "Cuzco Wall Mount"]},
+			"Science Station": {rarity: 82, splice: ["Toxic Waste Barrel", "Military Radio"]},
+			"Steel Girder": {rarity: 50, splice: ["Steel Block", "Lattice Background"]},
+			"Streetlamp": {rarity: 44, splice: ["Neon Lights", "Plumbing"]},
+			"The Darkness": {rarity: 40, splice: ["Steel Block", "Evil Bricks"]},
 
 			// Geiger Counter items
 			"Radioactive Chemical": {geigerReward: "Geiger Counter"},
@@ -1004,7 +1027,7 @@
 			"Pastel Suit": {rarity: 11, splice: ["Magic Egg", "Painting: Dink Duck"]},
 			"Pastel Pants": {rarity: 4, splice: ["Magic Egg", "Daisy"]},
 			"Hippie Sandals": {rarity: 23, splice: ["Magic Egg", "Wall Like An Egyptian"]},
-			"Rotten Egg": {rarity: 6, splice: ["Magic Egg", "Magic Bricks"]},
+			"Rotten Egg": {rarity: 6, splice: ["Magic Egg", "Evil Bricks"]},
 			"Cuddly Bunny": {rarity: 41, splice: ["Magic Egg", "Fishbowl"]},
 			"Psychotic Bunny": {rarity: 41, splice: ["Magic Egg", "Fishbowl"]},
 			"Pastel Aqua Block": {rarity: 6, splice: ["Magic Egg", "Aqua Block"]},
@@ -1232,10 +1255,14 @@
 				anchor.appendChild(itemHeading);
 				infoBox.appendChild(anchor);
 
-				if (item.rarity) {
-					var rarity = document.createElement("div");
-					rarity.innerText = "Rarity: " + item.rarity;
-					infoBox.appendChild(rarity);
+				if (item.hasOwnProperty("rarity")) {
+					if (item.rarity === 0) {
+						error("Item rarity missing for", itemName);
+					} else {
+						var rarity = document.createElement("div");
+						rarity.innerText = "Rarity: " + item.rarity;
+						infoBox.appendChild(rarity);
+					}
 				}
 
 				var source = document.createElement("p");

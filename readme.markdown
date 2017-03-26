@@ -30,12 +30,11 @@ I'm gradually filling in the item data. It's messy, but once I have it in a dece
 	- Inventory
 	- Special block (eg sewing machine)
 - Sewing
-- Science/cooking
-- Geiger hunting
 - Carnival prizes
 - Growganoth offerings
 - Fishing
 - Silkworms
 - "Instances" of an item, eg Tangram Blocks. Maybe just enter Tangram Block and it specifies its possible drops? Or maybe we enter both the base item and the versions of it.
+- Crystal harmonising
 
 - How to earn Growtokens?
