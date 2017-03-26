@@ -1104,7 +1104,8 @@
 			"Tommygun": {rarity: 87, splice: ["Time-Space Rupture", "Death Spikes"], fromStorePack: "Gangland Style"},
 			"Victrola": {rarity: 94, splice: ["Time-Space Rupture", "Olde Timey Radio"], fromStorePack: "Gangland Style"},
 			// GEN XIV
-			// "": {rarity: 0, splice: ["Block", "Block"]},
+			"Scoreboard": {rarity: 91, splice: ["Bulletin Board", "Table Lamp"]},
+			"Tavern Sign": {rarity: 85, splice: ["Art Deco Block", "Sign"], fromStorePack: "Fantasy Pack"},
 
 			// Geiger Counter items
 			"Radioactive Chemical": {geigerReward: "Geiger Counter"},
@@ -1467,10 +1468,15 @@
 				if (item.fromStorePack) {
 					var packHasItem = function(pack, itemName) {
 						var hasItem = false;
-						if (pack.items && pack.items.hasOwnProperty(itemName)) hasItem = true;
+						var seedName = itemName + " Seed";
+						if (pack.items) {
+							if (pack.items.hasOwnProperty(itemName)) hasItem = true;
+							if (pack.items.hasOwnProperty(seedName)) hasItem = true;
+						}
 						if (pack.randomItems) {
 							for (var setIndex in pack.randomItems) {
 								if (pack.randomItems[setIndex].options.hasOwnProperty(itemName)) hasItem = true;
+								if (pack.randomItems[setIndex].options.hasOwnProperty(seedName)) hasItem = true;
 							}
 						}
 						return hasItem;
