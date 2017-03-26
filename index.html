@@ -1319,6 +1319,13 @@
 			return name.replace(/\sseed$/i, "")
 						.replace(/\s/g, "_");
 		}
+		function makeItemLinks(itemNames) {
+			var links = [];
+			for (var i = 0; i < itemNames.length; i++) {
+				links.push("<a href=\"#" + makeItemLinkID(itemNames[i]) + "\">" + itemNames[i] + "</a>");
+			}
+			return links;
+		}
 		function makePackLinkID(name) {
 			var regex = /(pack|kit)/i;
 			if (!name.match(regex)) {
@@ -1332,6 +1339,20 @@
 		function makeWikiLink(itemName) {
 			var regex = /\s/g;
 			return "http://growtopia.wikia.com/wiki/" + itemName.replace(regex, "_");
+		}
+
+		function andJoin(array, and) {
+			if (!and) and = "and";
+			switch (array.length) {
+				case 0: return "";
+				case 1: return array[0];
+				case 2: return array[0] + " " + and + " " + array[1];
+				default: {
+					var allButLast = array.slice(0, -1);
+					var text = allButLast.join(", ");
+					return text + " " + and + " " + array[array.length-1];
+				}
+			}
 		}
 
 		function findAllChildItems(parentItem, items) {
@@ -1465,27 +1486,15 @@
 					if (item.spawnsInWorlds.length == 1 && item.spawnsInWorlds[0] == "normal") {
 						sourceInfo.push("Spawns naturally in new worlds.");
 					} else {
-						var t = "Spawns naturally in new ";
-						for (var i = 0; i < item.spawnsInWorlds.length; i++) {
-							var blastName = item.spawnsInWorlds[i];
-
-							if (!(blastName == "normal" || items[blastName])) {
-								error("Blast item not found:", blastName, "for item", itemName);
-								missingItemNames.push(blastName);
-							}
-
-							if (item.spawnsInWorlds.length > 1) {
-								if (i == item.spawnsInWorlds.length - 1) {
-									t += " and ";
-								} else if (i != 0) {
-									t += ", ";
-								}
-							}
-
-							t += "<a href=\"#" + makeItemLinkID(blastName) + "\">" + blastName + "</a> ";
+						var siw = item.spawnsInWorlds;
+						if (siw.includes("normal")) {
+							siw.splice(siw.indexOf("normal"), 1);
+							siw = makeItemLinks(siw);
+							siw.unshift("normal");
+						} else {
+							siw = makeItemLinks(siw);
 						}
-						t += "worlds.";
-						sourceInfo.push(t);
+						sourceInfo.push("Spawns naturally in new " + andJoin(siw, "and") + " worlds.");
 					}
 				}
 				if (item.spawnsDuringEvent) {
@@ -1546,6 +1555,9 @@
 					} else {
 						sourceInfo.push("Obtained by breaking a Bunny Egg at " + item.breakBunnyEgg.min + " to " + item.breakBunnyEgg.max + " size.");
 					}
+				}
+				if (item.fromGrowganoth) {
+					sourceInfo.push("Get by sacrificing one of the following to Growganoth: " + andJoin(makeItemLinks(item.fromGrowganoth), "or") + ".");
 				}
 				if (item.itemOfTheMonth) {
 					sourceInfo.push("Was the <a href=\"https://growtopiagame.com/itemomonth.php\" target=\"_blank\">Item of the Month</a> in " + item.itemOfTheMonth.month + " " + item.itemOfTheMonth.year + ", available in the Store for " + item.itemOfTheMonth.cost + " gems.");
