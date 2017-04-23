@@ -143,7 +143,12 @@ var data = {
 			}
 		},
 		"fromProvider": function(itemName, data) {
-			return "Is a drop when harvesting a " + data;
+			var provider = items[data];
+			if (provider && provider.providerCooldown) {
+				return "Is provided by a " + data + " every " + provider.providerCooldown + ".";
+			} else {
+				return "Is provided by a " + data + ".";
+			}
 		},
 		"minigameReward": function(itemName, data) {
 			return "Earned by completing the " + data + " mini-game";
@@ -1031,7 +1036,7 @@ var data = {
 		"Red Sportsball Jersey": {rarity: 28, recipes: {splice: ["Big Old Up Arrow", "White Block"], fromStorePack: "Racing Action Pack"}},
 		"Robot Wants Dubstep": {rarity: 65, recipes: {splice: ["Steel Block", "Note Block"]}},
 		"Roulette Wheel": {rarity: 51, recipes: {splice: ["Card Block", "Cuzco Wall Mount"], fromStorePack: "Vegas Pack"}},
-		"Science Station": {rarity: 82, recipes: {splice: ["Toxic Waste Barrel", "Military Radio"], fromStorePack: "Mad Science Kit"}},
+		"Science Station": {rarity: 82, providerCooldown: "12 hours (roughly)", recipes: {splice: ["Toxic Waste Barrel", "Military Radio"], fromStorePack: "Mad Science Kit"}},
 		"Steel Girder": {rarity: 50, recipes: {splice: ["Steel Block", "Lattice Background"]}},
 		"Streetlamp": {rarity: 44, recipes: {splice: ["Neon Lights", "Plumbing"]}},
 		"The Darkness": {rarity: 40, recipes: {splice: ["Steel Block", "Evil Bricks"]}},
