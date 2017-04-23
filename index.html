@@ -77,6 +77,10 @@
 			margin-left: 1em;
 		}
 
+		.search--no-match {
+			display: none;
+		}
+
 	</style>
 </head>
 
@@ -88,18 +92,23 @@
 		<p><span id="introErrorCount">0</span> errors detected, and <span id="introMissingItemCount">0</span> known missing items.</p>
 	</header>
 
-	<nav class="tableOfContents box">
-		<div>
-			<h2>All items (<span id="itemCount"></span>)</h2>
-			<ul id="itemsList"></ul>
-		</div>
-		<div>
-			<h2>Item Packs (<span id="packCount"></span>)</h2>
-			<ul id="packsList"></ul>
-		</div>
-		<div>
-			<h2>Missing Items (<span id="missingItemCount"></span>)</h2>
-			<ul id="missingItemsList"></ul>
+	<nav class="box">
+		<form class="search">
+			<label>Search: <input type="search" id="search" /></label>
+		</form>
+		<div class="tableOfContents">
+			<div>
+				<h2>All items (<span id="itemCount"></span>)</h2>
+				<ul id="itemsList"></ul>
+			</div>
+			<div>
+				<h2>Item Packs (<span id="packCount"></span>)</h2>
+				<ul id="packsList"></ul>
+			</div>
+			<div>
+				<h2>Missing Items (<span id="missingItemCount"></span>)</h2>
+				<ul id="missingItemsList"></ul>
+			</div>
 		</div>
 	</nav>
 
@@ -453,6 +462,68 @@
 				missingItemsList.appendChild(li);
 			}
 		}
+
+		var searchBox = document.getElementById("search");
+		searchBox.addEventListener("input", function() {
+			if (searchBox.value.length == 0) {
+				// remove all filters
+
+				// items
+				for (var i=0; i < itemsList.children.length; i++) {
+					itemsList.children[i].classList.remove("search--no-match");
+					itemInfoBoxes.children[i].classList.remove("search--no-match");
+				}
+
+				// missing items
+				for (var i=0; i < missingItemsList.children.length; i++) {
+					missingItemsList.children[i].classList.remove("search--no-match");
+				}
+
+				// packs
+				for (var i=0; i < packsList.children.length; i++) {
+					packsList.children[i].classList.remove("search--no-match");
+				}
+
+			} else {
+				// Filter!
+				var regex = new RegExp(".*" + searchBox.value, "i");
+
+				for (var i=0; i < itemsList.children.length; i++) {
+					var child = itemsList.children[i];
+					var childBox = itemInfoBoxes.children[i];
+					if (child.textContent.search(regex)) {
+						child.classList.add("search--no-match");
+						childBox.classList.add("search--no-match");
+					} else {
+						child.classList.remove("search--no-match");
+						childBox.classList.remove("search--no-match");
+					}
+				}
+
+				// missing items
+				for (var i=0; i < missingItemsList.children.length; i++) {
+					var child = missingItemsList.children[i];
+					if (child.textContent.search(regex)) {
+						child.classList.add("search--no-match");
+					} else {
+						child.classList.remove("search--no-match");
+					}
+				}
+
+				// packs
+				for (var i=0; i < packsList.children.length; i++) {
+					var child = packsList.children[i];
+					var childBox = packInfoBoxes.children[i];
+					if (child.textContent.search(regex)) {
+						child.classList.add("search--no-match");
+						childBox.classList.add("search--no-match");
+					} else {
+						child.classList.remove("search--no-match");
+						childBox.classList.remove("search--no-match");
+					}
+				}
+			}
+		});
 
 		document.getElementById("introMissingItemCount").innerText = missingItemNames.length;
 		document.getElementById("introErrorCount").innerText = errorCount;
