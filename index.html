@@ -116,6 +116,149 @@
 		var spriteWidth = 32,
 			spriteHeight = 32;
 
+		var recipeTypes = {
+			"splice": function(itemName, data) {
+				var parent1 = items[data[0]];
+				var parent2 = items[data[1]];
+				// Check splicing parent names
+				if (!parent1) {
+					error("Item", itemName, "parent item not found: ", data[0]);
+					missingItemNames.push(data[0]);
+				}
+				if (!parent2) {
+					error("Item", itemName, "parent item not found: ", data[1]);
+					missingItemNames.push(data[1]);
+				}
+
+				// Check the rarities match!
+				if (parent1 && parent2) {
+					var targetRarity = parent1.rarity + parent2.rarity;
+					if (item.rarity != targetRarity) {
+						error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
+					}
+				}
+
+				return "Splice a "
+					+ "<a href=\"#" + makeItemLinkID(data[0]) + "\">" + data[0] + "</a> seed with a "
+					+ "<a href=\"#" + makeItemLinkID(data[1]) + "\">" + data[1] + "</a> seed.";
+			},
+
+			"availableDuringEvent": function(itemName, data) {
+				return "<em>This item can only be created during " + data + ".</em>";
+			},
+			"chemicalCombine": function(itemName, data) {
+				var ingredients = Object.keys(data.ingredients);
+				return "Make " + data.count + " by combining "
+					+ ingredients[0] + " <a href=\"#" + makeItemLinkID(ingredients[0]) + "\">" + ingredients[0] + "</a>, "
+					+ ingredients[1] + " <a href=\"#" + makeItemLinkID(ingredients[1]) + "\">" + ingredients[1] + "</a> and "
+					+ ingredients[2] + " <a href=\"#" + makeItemLinkID(ingredients[2]) + "\">" + ingredients[2] + "</a> "
+					+ "in any Chemical Combiner.";
+			},
+			"spawnsInWorlds": function(itemName, data) {
+				if (data.length == 1 && data[0] == "normal") {
+					return "Spawns naturally in new worlds.";
+				} else {
+					var siw = data;
+					if (siw.includes("normal")) {
+						siw.splice(siw.indexOf("normal"), 1);
+						siw = makeItemLinks(siw);
+						siw.unshift("normal");
+					} else {
+						siw = makeItemLinks(siw);
+					}
+					return "Spawns naturally in new " + andJoin(siw, "and") + " worlds.";
+				}
+			},
+			"spawnsDuringEvent": function(itemName, data) {
+				return "Spawns in active worlds during " + data + ".";
+			},
+			"specialEventSpawn": function(itemName, data) {
+				return "Spawns in the '" + data + "' special event.";
+			},
+			"geigerReward": function(itemName, data) {
+				return "Can be found when using a <a href=\"#" + makeItemLinkID(data) + "\">" + data + "</a>.";
+			},
+			"villainDrop": function(itemName, data) {
+				return "Is a possible reward for defeating " + data + " in a card battle.";
+			},
+			"fishing": function(itemName, data) {
+				return "Is a fish you can catch using <a href=\"#" + makeItemLinkID(data.minBait) + "\">" + data.minBait + "</a> or better.";
+			},
+			"fromGemsPack": function(itemName, data) {
+				return "Get " + data.count + " when buying the " + data.name + " package from the Store.";
+			},
+			"fromStorePack": function(itemName, data) {
+				if (!packs.hasOwnProperty(data)) {
+					error("Item ", itemName, " refers to missing store pack \"", data, "\"");
+				} else {
+					var pack = packs[data];
+					if (!pack) {
+						error("Item ", itemName, " says it's in the store pack \"", data, "\", which doesn't exist!");
+					} else if (!packHasItem(pack, itemName)) {
+						error("Item ", itemName, " says it's in the store pack \"", data, "\", which doesn't include it.");
+					} else {
+						if (pack.items && pack.items.hasOwnProperty(itemName)) {
+							var itemInPack = pack.items[itemName];
+							var t = "Get " + itemInPack + " when buying the "
+							+ "<a href=\"#" + makePackLinkID(data) + "\">" + data + "</a> for " + pack.cost + " gems from the Store";
+
+							if (pack.availableDuringEvent) {
+								t += " during " + pack.availableDuringEvent + ".";
+							} else {
+								t += ".";
+							}
+
+							return t;
+						} else {
+							// It's a random chance from that pack.
+							return "Get randomly when buying the "
+							+ "<a href=\"#" + makePackLinkID(data) + "\">" + data + "</a> for " + pack.cost + " gems from the Store";
+						}
+					}
+				}
+			},
+			"rareWhenHarvesting": function(itemName, data) {
+				return "Is a rare drop when harvesting <a href=\"#" + makeItemLinkID(data) + "\">" + data + "</a> trees.";
+			},
+			"breakBunnyEgg": function(itemName, data) {
+				if (data.min == data.max) {
+					return "Obtained by breaking a Bunny Egg at " + data.min + " size.";
+				} else {
+					return "Obtained by breaking a Bunny Egg at " + data.min + " to " + data.max + " size.";
+				}
+			},
+			"fromGrowganoth": function(itemName, data) {
+				return "Get by sacrificing one of the following to Growganoth: " + andJoin(makeItemLinks(data), "or") + ".";
+			},
+			"itemOfTheMonth": function(itemName, data) {
+				return "Was the <a href=\"https://growtopiagame.com/itemomonth.php\" target=\"_blank\">Item of the Month</a> in " + data.month + " " + data.year + ", available in the Store for " + data.cost + " gems.";
+			},
+			"store": function(itemName, data) {
+				return "Available in the Store for " + data.cost + " gems, in the " + data.section + " section.";
+			},
+			"tokenStore": function(itemName, data) {
+				return "Available in the Store for " + data + " Growtokens.";
+			},
+			"competition": function(itemName, data) {
+				return "Is a prize for winning " + data.name
+					+ ". <a href=\"" + data.url + "\" target=\"_blank\">Enter here</a>";
+			},
+			"dailyChallengeReward": function(itemName, data) {
+				switch (data.places) {
+					case "all": return "Is a prize for being in the top 3 in the " + data.challenge + " daily challenge."; break;
+					case 1: return "Is a prize for getting 1st Place in the " + data.challenge + " daily challenge."; break;
+					case 2: return "Is a prize for getting 2nd Place in the " + data.challenge + " daily challenge."; break;
+					case 3: return "Is a prize for getting 3rd Place in the " + data.challenge + " daily challenge."; break;
+				}
+			},
+			"fromProvider": function(itemName, data) {
+				return "Is a drop when harvesting a " + data;
+			},
+			"minigameReward": function(itemName, data) {
+				return "Earned by completing the " + data + " mini-game";
+			},
+		};
+
 		var packs = {
 			// Event Packs
 			"St. Patrick's Pack": {
@@ -751,567 +894,567 @@
 		// But I'm starting off with SEEDIARY's info, so these are in the order they appear there!
 		var items = {
 			// GEN I
-			"Dirt": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 1},
-			"Cave Background": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 7},
-			"Rock": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 5},
-			"Lava": {rarity: 1, spawnsInWorlds: ["normal"], spriteIndex: 2},
-			"Crystal Block": {rarity: 100, specialEventSpawn: "Beautiful Crystal"},
-			"Sand": {rarity: 1, spawnsInWorlds: ["Beach Blast"]},
-			"Ocean Rock": {rarity: 1, spawnsInWorlds: ["Beach Blast", "Undersea Blast"]},
-			"Garbage": {rarity: 1},
-			"Sandstone Wall": {rarity: 1, spawnsInWorlds: ["Desert Blast"]},
-			"Boulder": {rarity: 1, spawnsInWorlds: ["Desert Blast"]},
-			"Obelisk": {rarity: 30, spawnsInWorlds: ["Desert Blast"], spriteIndex: 487},
+			"Dirt": {rarity: 1, recipes: {spawnsInWorlds: ["normal"]}, spriteIndex: 1},
+			"Cave Background": {rarity: 1, recipes: {spawnsInWorlds: ["normal"]}, spriteIndex: 7},
+			"Rock": {rarity: 1, recipes: {spawnsInWorlds: ["normal"]}, spriteIndex: 5},
+			"Lava": {rarity: 1, recipes: {spawnsInWorlds: ["normal"]}, spriteIndex: 2},
+			"Crystal Block": {rarity: 100, recipes: {specialEventSpawn: "Beautiful Crystal"}},
+			"Sand": {rarity: 1, recipes: {spawnsInWorlds: ["Beach Blast"]}},
+			"Ocean Rock": {rarity: 1, recipes: {spawnsInWorlds: ["Beach Blast", "Undersea Blast"]}},
+			"Garbage": {rarity: 1, recipes: {}},
+			"Sandstone Wall": {rarity: 1, recipes: {spawnsInWorlds: ["Desert Blast"]}},
+			"Boulder": {rarity: 1, recipes: {spawnsInWorlds: ["Desert Blast"]}},
+			"Obelisk": {rarity: 30, recipes: {spawnsInWorlds: ["Desert Blast"]}, spriteIndex: 487},
 			// Gen II
-			"Door": {rarity: 2, splice: ["Dirt", "Cave Background"], fromStorePack: "Door & Sign Hello Pack", spriteIndex: 6},
-			"Sign": {rarity: 2, splice: ["Rock", "Cave Background"], fromStorePack: "Door & Sign Hello Pack", spriteIndex: 10},
-			"Grass": {rarity: 2, splice: ["Rock", "Dirt"], spriteIndex: 8},
-			"Wood Block": {rarity: 2, splice: ["Dirt", "Lava"]},
-			"Glass Pane": {rarity: 2, splice: ["Rock", "Lava"], spriteIndex: 28},
-			"Lava Rock": {rarity: 2, splice: ["Cave Background", "Lava"]},
+			"Door": {rarity: 2, recipes: {splice: ["Dirt", "Cave Background"], fromStorePack: "Door & Sign Hello Pack"}, spriteIndex: 6},
+			"Sign": {rarity: 2, recipes: {splice: ["Rock", "Cave Background"], fromStorePack: "Door & Sign Hello Pack"}, spriteIndex: 10},
+			"Grass": {rarity: 2, recipes: {splice: ["Rock", "Dirt"]}, spriteIndex: 8},
+			"Wood Block": {rarity: 2, recipes: {splice: ["Dirt", "Lava"]}},
+			"Glass Pane": {rarity: 2, recipes: {splice: ["Rock", "Lava"]}, spriteIndex: 28},
+			"Lava Rock": {rarity: 2, recipes: {splice: ["Cave Background", "Lava"]}},
 			// GEN III
-			"Daisy": {rarity: 3, splice: ["Grass", "Dirt"], spriteIndex: 11},
-			"Rose": {rarity: 3, splice: ["Grass", "Lava"]},
-			"Mushroom": {rarity: 3, splice: ["Grass", "Cave Background"]},
-			"Bricks": {rarity: 3, splice: ["Grass", "Rock"]},
-			"Rock Background": {rarity: 3, splice: ["Door", "Rock"]},
-			"Wooden Background": {rarity: 4, splice: ["Door", "Grass"], spriteIndex: 26},
-			"Wooden Platform": {rarity: 4, splice: ["Wood Block", "Grass"]},
-			"Crappy Sign": {rarity: 3, splice: ["Door", "Dirt"], spriteIndex: 13},
-			"Pointy Sign": {rarity: 4, splice: ["Door", "Sign"], spriteIndex: 12},
-			"Super Crate Box": {rarity: 3, splice: ["Sign", "Dirt"]},
-			"Amber Glass": {rarity: 3, splice: ["Glass Pane", "Dirt"]},
-			"Happy Joy Plaque": {rarity: 3, splice: ["Door", "Cave Background"]},
-			"Cargo Shorts": {rarity: 3, splice: ["Wood Block", "Dirt"]},
-			"Torch": {rarity: 3, splice: ["Sign", "Lava"]},
-			"Wheat": {rarity: 3, splice: ["Grass", "Sand"], fromStorePack: "Farm Pack"},
+			"Daisy": {rarity: 3, recipes: {splice: ["Grass", "Dirt"]}, spriteIndex: 11},
+			"Rose": {rarity: 3, recipes: {splice: ["Grass", "Lava"]}},
+			"Mushroom": {rarity: 3, recipes: {splice: ["Grass", "Cave Background"]}},
+			"Bricks": {rarity: 3, recipes: {splice: ["Grass", "Rock"]}},
+			"Rock Background": {rarity: 3, recipes: {splice: ["Door", "Rock"]}},
+			"Wooden Background": {rarity: 4, recipes: {splice: ["Door", "Grass"]}, spriteIndex: 26},
+			"Wooden Platform": {rarity: 4, recipes: {splice: ["Wood Block", "Grass"]}},
+			"Crappy Sign": {rarity: 3, recipes: {splice: ["Door", "Dirt"]}, spriteIndex: 13},
+			"Pointy Sign": {rarity: 4, recipes: {splice: ["Door", "Sign"]}, spriteIndex: 12},
+			"Super Crate Box": {rarity: 3, recipes: {splice: ["Sign", "Dirt"]}},
+			"Amber Glass": {rarity: 3, recipes: {splice: ["Glass Pane", "Dirt"]}},
+			"Happy Joy Plaque": {rarity: 3, recipes: {splice: ["Door", "Cave Background"]}},
+			"Cargo Shorts": {rarity: 3, recipes: {splice: ["Wood Block", "Dirt"]}},
+			"Torch": {rarity: 3, recipes: {splice: ["Sign", "Lava"]}},
+			"Wheat": {rarity: 3, recipes: {splice: ["Grass", "Sand"], fromStorePack: "Farm Pack"}},
 			// GEN IV
-			"Poppy": {rarity: 6, splice: ["Daisy", "Rose"]},
-			"Brown Block": {rarity: 4, splice: ["Bricks", "Dirt"]},
-			"Black Block": {rarity: 4, splice: ["Bricks", "Cave Background"]},
-			"Grey Block": {rarity: 4, splice: ["Bricks", "Rock"]},
-			"Red Block": {rarity: 4, splice: ["Bricks", "Lava"]},
-			"Green Block": {rarity: 5, splice: ["Bricks", "Grass"]},
-			"Yellow Block": {rarity: 6, splice: ["Bricks", "Daisy"]},
-			"Aqua Block": {rarity: 5, splice: ["Bricks", "Glass Pane"]},
-			"White Block": {rarity: 6, splice: ["Bricks", "Mushroom"]},
-			"Danger Sign": {rarity: 5, splice: ["Pointy Sign", "Lava"], spriteIndex: 14},
-			"Wooden Table": {rarity: 6, splice: ["Wooden Platform", "Wood Block"]},
-			"Window": {rarity: 6, splice: ["Wooden Background", "Glass Pane"], spriteIndex: 27},
-			"Flowery Wallpaper": {rarity: 7, splice: ["Wooden Background", "Daisy"]},
-			"Mud Glob": {rarity: 4, splice: ["Daisy", "Dirt"]},
-			"Tan Shirt": {rarity: 4, splice: ["Rock Background", "Dirt"]},
-			"Stinky Socks": {rarity: 4, splice: ["Mushroom", "Dirt"]},
-			"Shallot Mustache": {rarity: 5, splice: ["Mushroom", "Grass"]},
-			"Messy Brown Hair": {rarity: 5, splice: ["Crappy Sign", "Grass"]},
+			"Poppy": {rarity: 6, recipes: {splice: ["Daisy", "Rose"]}},
+			"Brown Block": {rarity: 4, recipes: {splice: ["Bricks", "Dirt"]}},
+			"Black Block": {rarity: 4, recipes: {splice: ["Bricks", "Cave Background"]}},
+			"Grey Block": {rarity: 4, recipes: {splice: ["Bricks", "Rock"]}},
+			"Red Block": {rarity: 4, recipes: {splice: ["Bricks", "Lava"]}},
+			"Green Block": {rarity: 5, recipes: {splice: ["Bricks", "Grass"]}},
+			"Yellow Block": {rarity: 6, recipes: {splice: ["Bricks", "Daisy"]}},
+			"Aqua Block": {rarity: 5, recipes: {splice: ["Bricks", "Glass Pane"]}},
+			"White Block": {rarity: 6, recipes: {splice: ["Bricks", "Mushroom"]}},
+			"Danger Sign": {rarity: 5, recipes: {splice: ["Pointy Sign", "Lava"]}, spriteIndex: 14},
+			"Wooden Table": {rarity: 6, recipes: {splice: ["Wooden Platform", "Wood Block"]}},
+			"Window": {rarity: 6, recipes: {splice: ["Wooden Background", "Glass Pane"]}, spriteIndex: 27},
+			"Flowery Wallpaper": {rarity: 7, recipes: {splice: ["Wooden Background", "Daisy"]}},
+			"Mud Glob": {rarity: 4, recipes: {splice: ["Daisy", "Dirt"]}},
+			"Tan Shirt": {rarity: 4, recipes: {splice: ["Rock Background", "Dirt"]}},
+			"Stinky Socks": {rarity: 4, recipes: {splice: ["Mushroom", "Dirt"]}},
+			"Shallot Mustache": {rarity: 5, recipes: {splice: ["Mushroom", "Grass"]}},
+			"Messy Brown Hair": {rarity: 5, recipes: {splice: ["Crappy Sign", "Grass"]}},
 			// GEN V
-			"Orange Block": {rarity: 9, splice: ["Bricks", "Poppy"]},
-			"Evil Bricks": {rarity: 5, splice: ["Black Block", "Lava"]},
-			"Brick Background": {rarity: 7, splice: ["Black Block", "Bricks"]},
-			"Stone Wall": {rarity: 5, splice: ["Grey Block", "Rock"]},
-			"Dungeon Door": {rarity: 8, splice: ["Window", "Door"], spriteIndex: 15},
-			"Toilet": {rarity: 7, splice: ["Brown Block", "Crappy Sign"]},
-			"Bush": {rarity: 9, splice: ["Poppy", "Rose"]},
-			"Wooden Window": {rarity: 10, splice: ["Window", "Wooden Background"], spriteIndex: 29},
-			"Painting: Dink Duck": {rarity: 10, splice: ["Yellow Block", "Wooden Background"]},
-			"Painting: Yerfdog": {rarity: 10, splice: ["White Block", "Wooden Background"]},
-			"Death Spikes": {rarity: 8, splice: ["Danger Sign", "Rock Background"]},
-			"Stripey Wallpaper": {rarity: 10, splice: ["Green Block", "Aqua Block"]},
-			"Glass Block": {rarity: 7, splice: ["Glass Pane", "Aqua Block"]},
-			"Brown Hair": {rarity: 5, splice: ["Brown Block", "Dirt"]},
-			"Red Hair": {rarity: 6, splice: ["Red Block", "Grass"], spriteIndex: 22},
-			"Green Shirt": {rarity: 7, splice: ["Green Block", "Grass"], spriteIndex: 18},
-			"Jeans": {rarity: 6, splice: ["Aqua Block", "Rock"], spriteIndex: 24},
-			"Brown Shoes": {rarity: 5, splice: ["Brown Block", "Cave Background"], spriteIndex: 20},
-			"Biker Stache": {rarity: 6, splice: ["Brown Block", "Grass"]},
-			"Boots": {rarity: 5, splice: ["Black Block", "Rock"], spriteIndex: 21},
-			"Hot Head": {rarity: 5, splice: ["Red Block", "Lava"]},
-			"Shades": {rarity: 6, splice: ["Black Block", "Glass Pane"], spriteIndex: 17},
-			"Red Riding Hood": {rarity: 7, splice: ["Red Block", "Mushroom"]},
-			"Blonde Bombshell": {rarity: 8, splice: ["Yellow Block", "Grass"]},
-			"Long Brown Hair": {rarity: 8, splice: ["Wooden Table", "Grass"]},
-			"Green Skirt": {rarity: 11, splice: ["Green Block", "Poppy"]},
-			"Lovely Pink Dress": {rarity: 10, splice: ["Flowery Wallpaper", "Mushroom"]},
-			"Flashlight": {rarity: 10, splice: ["Black Block", "Yellow Block"]},
-			"X-Ray Specs": {rarity: 8, splice: ["White Block", "Glass Pane"]},
-			"Referee Shirt": {rarity: 10, splice: ["White Block", "Black Block"]},
-			"Rooster Hat": {rarity: 12, splice: ["White Block", "Yellow Block"]},
-			"Cyclopean Visor": {rarity: 10, splice: ["Red Block", "Window"]},
-			"Gold-Rimmed Glasses": {rarity: 12, splice: ["Yellow Block", "Window"]},
-			"Top Hat": {rarity: 7, splice: ["Black Block", "Mushroom"]},
-			"Tuxedo": {rarity: 7, splice: ["Grey Block", "Rose"], spriteIndex: 19},
-			"Black Pants": {rarity: 6, splice: ["Black Block", "Door"]},
-			"Santa Hat": {rarity: 10, splice: ["White Block", "Red Block"]},
-			"Santa Vest": {rarity: 7, splice: ["White Block", "Lava"]},
-			"Santa Pants": {rarity: 5, splice: ["Grey Block", "Lava"]},
-			"Sheet Music: Blank": {rarity: 9, splice: ["White Block", "Super Crate Box"], fromStorePack: "Composer's Pack"},
-			"Red Bricks": {rarity: 7, splice: ["Red Block", "Bricks"], fromStorePack: "Education Pack"},
-			"Pencil": {rarity: 8, splice: ["Yellow Block", "Wood Block"]},
-			"Worthless Rags": {rarity: 5, splice: ["Mud Glob", "Dirt"], fromStorePack: "Dungeon Pack"},
-			"Barn Block": {rarity: 7, splice: ["Red Block", "Super Crate Box"]},
-			"Red Wood Wall": {rarity: 8, splice: ["Red Block", "Wooden Background"]},
+			"Orange Block": {rarity: 9, recipes: {splice: ["Bricks", "Poppy"]}},
+			"Evil Bricks": {rarity: 5, recipes: {splice: ["Black Block", "Lava"]}},
+			"Brick Background": {rarity: 7, recipes: {splice: ["Black Block", "Bricks"]}},
+			"Stone Wall": {rarity: 5, recipes: {splice: ["Grey Block", "Rock"]}},
+			"Dungeon Door": {rarity: 8, recipes: {splice: ["Window", "Door"]}, spriteIndex: 15},
+			"Toilet": {rarity: 7, recipes: {splice: ["Brown Block", "Crappy Sign"]}},
+			"Bush": {rarity: 9, recipes: {splice: ["Poppy", "Rose"]}},
+			"Wooden Window": {rarity: 10, recipes: {splice: ["Window", "Wooden Background"]}, spriteIndex: 29},
+			"Painting: Dink Duck": {rarity: 10, recipes: {splice: ["Yellow Block", "Wooden Background"]}},
+			"Painting: Yerfdog": {rarity: 10, recipes: {splice: ["White Block", "Wooden Background"]}},
+			"Death Spikes": {rarity: 8, recipes: {splice: ["Danger Sign", "Rock Background"]}},
+			"Stripey Wallpaper": {rarity: 10, recipes: {splice: ["Green Block", "Aqua Block"]}},
+			"Glass Block": {rarity: 7, recipes: {splice: ["Glass Pane", "Aqua Block"]}},
+			"Brown Hair": {rarity: 5, recipes: {splice: ["Brown Block", "Dirt"]}},
+			"Red Hair": {rarity: 6, recipes: {splice: ["Red Block", "Grass"]}, spriteIndex: 22},
+			"Green Shirt": {rarity: 7, recipes: {splice: ["Green Block", "Grass"]}, spriteIndex: 18},
+			"Jeans": {rarity: 6, recipes: {splice: ["Aqua Block", "Rock"]}, spriteIndex: 24},
+			"Brown Shoes": {rarity: 5, recipes: {splice: ["Brown Block", "Cave Background"]}, spriteIndex: 20},
+			"Biker Stache": {rarity: 6, recipes: {splice: ["Brown Block", "Grass"]}},
+			"Boots": {rarity: 5, recipes: {splice: ["Black Block", "Rock"]}, spriteIndex: 21},
+			"Hot Head": {rarity: 5, recipes: {splice: ["Red Block", "Lava"]}},
+			"Shades": {rarity: 6, recipes: {splice: ["Black Block", "Glass Pane"]}, spriteIndex: 17},
+			"Red Riding Hood": {rarity: 7, recipes: {splice: ["Red Block", "Mushroom"]}},
+			"Blonde Bombshell": {rarity: 8, recipes: {splice: ["Yellow Block", "Grass"]}},
+			"Long Brown Hair": {rarity: 8, recipes: {splice: ["Wooden Table", "Grass"]}},
+			"Green Skirt": {rarity: 11, recipes: {splice: ["Green Block", "Poppy"]}},
+			"Lovely Pink Dress": {rarity: 10, recipes: {splice: ["Flowery Wallpaper", "Mushroom"]}},
+			"Flashlight": {rarity: 10, recipes: {splice: ["Black Block", "Yellow Block"]}},
+			"X-Ray Specs": {rarity: 8, recipes: {splice: ["White Block", "Glass Pane"]}},
+			"Referee Shirt": {rarity: 10, recipes: {splice: ["White Block", "Black Block"]}},
+			"Rooster Hat": {rarity: 12, recipes: {splice: ["White Block", "Yellow Block"]}},
+			"Cyclopean Visor": {rarity: 10, recipes: {splice: ["Red Block", "Window"]}},
+			"Gold-Rimmed Glasses": {rarity: 12, recipes: {splice: ["Yellow Block", "Window"]}},
+			"Top Hat": {rarity: 7, recipes: {splice: ["Black Block", "Mushroom"]}},
+			"Tuxedo": {rarity: 7, recipes: {splice: ["Grey Block", "Rose"]}, spriteIndex: 19},
+			"Black Pants": {rarity: 6, recipes: {splice: ["Black Block", "Door"]}},
+			"Santa Hat": {rarity: 10, recipes: {splice: ["White Block", "Red Block"]}},
+			"Santa Vest": {rarity: 7, recipes: {splice: ["White Block", "Lava"]}},
+			"Santa Pants": {rarity: 5, recipes: {splice: ["Grey Block", "Lava"]}},
+			"Sheet Music: Blank": {rarity: 9, recipes: {splice: ["White Block", "Super Crate Box"], fromStorePack: "Composer's Pack"}},
+			"Red Bricks": {rarity: 7, recipes: {splice: ["Red Block", "Bricks"], fromStorePack: "Education Pack"}},
+			"Pencil": {rarity: 8, recipes: {splice: ["Yellow Block", "Wood Block"]}},
+			"Worthless Rags": {rarity: 5, recipes: {splice: ["Mud Glob", "Dirt"], fromStorePack: "Dungeon Pack"}},
+			"Barn Block": {rarity: 7, recipes: {splice: ["Red Block", "Super Crate Box"]}},
+			"Red Wood Wall": {rarity: 8, recipes: {splice: ["Red Block", "Wooden Background"]}},
 			// GEN VI
-			"Afro": {rarity: 13, splice: ["Bush", "Black Block"]},
-			"Asbestos Boots": {rarity: 11, splice: ["Evil Bricks", "Yellow Block"]},
-			"Barn Door": {rarity: 9, splice: ["Door", "Barn Block"], fromStorePack: "Farm Pack"},
-			"Barrel": {rarity: 11, splice: ["Dungeon Door", "Super Crate Box"], fromStorePack: "Fantasy Pack"},
-			"Baseball Cap": {rarity: 13, splice: ["Bush", "Wooden Platform"], spriteIndex: 23},
-			"Bathtub": {rarity: 13, splice: ["Toilet", "White Block"]},
-			"Big Old Sideways Arrow": {rarity: 13, splice: ["Orange Block", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
-			"Biohazard Sign": {rarity: 14, splice: ["Orange Block", "Danger Sign"], fromStorePack: "Zombie Defense Pack"},
-			"Blueberry": {rarity: 12, splice: ["Bush", "Mushroom"]},
-			"Briefcase": {rarity: 14, splice: ["Stripey Wallpaper", "Brown Block"]},
-			"Burglar Mask": {rarity: 8, splice: ["Brick Background", "Cave Background"]},
-			"Cactus": {rarity: 17, splice: ["Death Spikes", "Bush"]},
-			"Checker Wallpaper": {rarity: 11, splice: ["Evil Bricks", "Window"]},
-			"Cuzco Wall Mount": {rarity: 18, splice: ["Painting: Yerfdog", "Dungeon Door"]},
-			"Devil Horns": {rarity: 9, splice: ["Death Spikes", "Lava"]},
-			"Dresser": {rarity: 14, splice: ["Dungeon Door", "Wooden Table"]},
-			"Froghat": {rarity: 14, splice: ["Bush", "Aqua Block"]},
-			"Gambler's Visor": {rarity: 12, splice: ["Glass Block", "Green Block"], fromStorePack: "Vegas Pack"},
-			"Green Blouse": {rarity: 14, splice: ["Bush", "Green Block"]},
-			"Grimstone": {rarity: 7, splice: ["Stone Wall", "Grass"], fromStorePack: "Dungeon Pack"},
-			"Hedge": {rarity: 8, rareWhenHarvesting: "Bush"},
-			"House Entrance": {rarity: 10, splice: ["Dungeon Door", "Door"]},
-			"Olde Timey Radio": {rarity: 15, splice: ["Toilet", "Dungeon Door"]},
-			"Patent Leather Shoes": {rarity: 11, splice: ["Brick Background", "Grey Block"]},
-			"Pigtails": {rarity: 12, splice: ["Daisy", "Orange Block"]},
-			"Polka Dot Block": {rarity: 15, splice: ["Orange Block", "White Block"]},
-			"Portcullis": {rarity: 16, splice: ["Death Spikes", "Dungeon Door"], spriteIndex: 30},
-			"Red Coat": {rarity: 13, splice: ["Bush", "Red Block"]},
-			"Sheet Music: Drums": {rarity: 13, splice: ["Sheet Music: Blank", "Brown Block"], fromStorePack: "Composer's Pack"},
-			"Sheet Music: Piano Note": {rarity: 14, splice: ["Sheet Music: Blank", "Green Block"], fromStorePack: "Composer's Pack"},
-			"Sidewalk": {rarity: 11, splice: ["Red Bricks", "Grey Block"]},
-			"Spikey Hair": {rarity: 14, splice: ["Death Spikes", "Yellow Block"]},
-			"Sword": {rarity: 11, splice: ["Death Spikes", "Rock Background"]},
-			"Tomato": {rarity: 11, splice: ["Red Bricks", "Mud Glob"]},
-			"Viking Helmet": {rarity: 9, splice: ["Stone Wall", "Pointy Sign"]},
-			"Water Bucket": {rarity: 12, splice: ["Toilet", "Aqua Block"]},
-			"White Beard": {rarity: 15, splice: ["Bush", "White Block"]},
-			"Wooden Chair": {rarity: 11, splice: ["Toilet", "Wooden Platform"]},
+			"Afro": {rarity: 13, recipes: {splice: ["Bush", "Black Block"]}},
+			"Asbestos Boots": {rarity: 11, recipes: {splice: ["Evil Bricks", "Yellow Block"]}},
+			"Barn Door": {rarity: 9, recipes: {splice: ["Door", "Barn Block"], fromStorePack: "Farm Pack"}},
+			"Barrel": {rarity: 11, recipes: {splice: ["Dungeon Door", "Super Crate Box"], fromStorePack: "Fantasy Pack"}},
+			"Baseball Cap": {rarity: 13, recipes: {splice: ["Bush", "Wooden Platform"]}, spriteIndex: 23},
+			"Bathtub": {rarity: 13, recipes: {splice: ["Toilet", "White Block"]}},
+			"Big Old Sideways Arrow": {rarity: 13, recipes: {splice: ["Orange Block", "Pointy Sign"], fromStorePack: "Racing Action Pack"}},
+			"Biohazard Sign": {rarity: 14, recipes: {splice: ["Orange Block", "Danger Sign"], fromStorePack: "Zombie Defense Pack"}},
+			"Blueberry": {rarity: 12, recipes: {splice: ["Bush", "Mushroom"]}},
+			"Briefcase": {rarity: 14, recipes: {splice: ["Stripey Wallpaper", "Brown Block"]}},
+			"Burglar Mask": {rarity: 8, recipes: {splice: ["Brick Background", "Cave Background"]}},
+			"Cactus": {rarity: 17, recipes: {splice: ["Death Spikes", "Bush"]}},
+			"Checker Wallpaper": {rarity: 11, recipes: {splice: ["Evil Bricks", "Window"]}},
+			"Cuzco Wall Mount": {rarity: 18, recipes: {splice: ["Painting: Yerfdog", "Dungeon Door"]}},
+			"Devil Horns": {rarity: 9, recipes: {splice: ["Death Spikes", "Lava"]}},
+			"Dresser": {rarity: 14, recipes: {splice: ["Dungeon Door", "Wooden Table"]}},
+			"Froghat": {rarity: 14, recipes: {splice: ["Bush", "Aqua Block"]}},
+			"Gambler's Visor": {rarity: 12, recipes: {splice: ["Glass Block", "Green Block"], fromStorePack: "Vegas Pack"}},
+			"Green Blouse": {rarity: 14, recipes: {splice: ["Bush", "Green Block"]}},
+			"Grimstone": {rarity: 7, recipes: {splice: ["Stone Wall", "Grass"], fromStorePack: "Dungeon Pack"}},
+			"Hedge": {rarity: 8, recipes: {rareWhenHarvesting: "Bush"}},
+			"House Entrance": {rarity: 10, recipes: {splice: ["Dungeon Door", "Door"]}},
+			"Olde Timey Radio": {rarity: 15, recipes: {splice: ["Toilet", "Dungeon Door"]}},
+			"Patent Leather Shoes": {rarity: 11, recipes: {splice: ["Brick Background", "Grey Block"]}},
+			"Pigtails": {rarity: 12, recipes: {splice: ["Daisy", "Orange Block"]}},
+			"Polka Dot Block": {rarity: 15, recipes: {splice: ["Orange Block", "White Block"]}},
+			"Portcullis": {rarity: 16, recipes: {splice: ["Death Spikes", "Dungeon Door"]}, spriteIndex: 30},
+			"Red Coat": {rarity: 13, recipes: {splice: ["Bush", "Red Block"]}},
+			"Sheet Music: Drums": {rarity: 13, recipes: {splice: ["Sheet Music: Blank", "Brown Block"], fromStorePack: "Composer's Pack"}},
+			"Sheet Music: Piano Note": {rarity: 14, recipes: {splice: ["Sheet Music: Blank", "Green Block"], fromStorePack: "Composer's Pack"}},
+			"Sidewalk": {rarity: 11, recipes: {splice: ["Red Bricks", "Grey Block"]}},
+			"Spikey Hair": {rarity: 14, recipes: {splice: ["Death Spikes", "Yellow Block"]}},
+			"Sword": {rarity: 11, recipes: {splice: ["Death Spikes", "Rock Background"]}},
+			"Tomato": {rarity: 11, recipes: {splice: ["Red Bricks", "Mud Glob"]}},
+			"Viking Helmet": {rarity: 9, recipes: {splice: ["Stone Wall", "Pointy Sign"]}},
+			"Water Bucket": {rarity: 12, recipes: {splice: ["Toilet", "Aqua Block"]}},
+			"White Beard": {rarity: 15, recipes: {splice: ["Bush", "White Block"]}},
+			"Wooden Chair": {rarity: 11, recipes: {splice: ["Toilet", "Wooden Platform"]}},
 			// GEN VII
-			"Ancient Stone Gate": {rarity: 17, splice: ["Portcullis", "Sandstone Wall"]},
-			"Apple": {rarity: 19, splice: ["Blueberry", "Red Bricks"], fromStorePack: "Education Pack"},
-			"Barky's Mask": {rarity: 21, splice: ["Barrel", "Painting: Yerfdog"]},
-			"Baseball Bat": {rarity: 12, splice: ["House Entrance", "Sign"]},
-			"Bed": {rarity: 14, splice: ["Wooden Chair", "Mushroom"]},
-			"Big Old Down Arrow": {rarity: 13, splice: ["Devil Horns", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
-			"Blue Block": {rarity: 15, splice: ["Blueberry", "Bricks"]},
-			"Brainwave Capacitor": {rarity: 21, splice: ["Olde Timey Radio", "Yellow Block"]},
-			"Bubble Wrap": {rarity: 14, splice: ["Blueberry", "Glass Pane"]},
-			"Gargoyle": {rarity: 16, splice: ["Grimstone", "Devil Horns"]},
-			"Grey Hair Bun": {rarity: 19, splice: ["Olde Timey Radio", "Grey Block"]},
-			"Just One Boxing Glove": {rarity: 16, splice: ["Blueberry", "Red Block"]},
-			"Lattice Background": {rarity: 15, splice: ["Wooden Chair", "Wooden Background"]},
-			"Long Black Hair": {rarity: 20, splice: ["Portcullis", "Black Block"]},
-			"Monster Feet": {rarity: 14, splice: ["Devil Horns", "Green Block"]},
-			"Pickaxe": {rarity: 17, splice: ["Portcullis", "Cave Background"]},
-			"Picket Fence": {rarity: 17, splice: ["Wooden Chair", "White Block"]},
-			"Plumbing": {rarity: 18, splice: ["Bathtub", "Green Block"]},
-			"Rubber Ducky": {rarity: 23, splice: ["Bathtub", "Painting: Dink Duck"]},
-			"Sandstone": {rarity: 18, splice: ["Cactus", "Dirt"]},
-			"School Desk": {rarity: 20, splice: ["Wooden Chair", "Orange Block"], fromStorePack: "Education Pack"},
-			"Seaweed": {rarity: 21, splice: ["Water Bucket", "Bush"]},
-			"Secret Passage": {rarity: 15, splice: ["Wood Block", "Big Old Sideways Arrow"]},
-			"Sexy Boxers": {rarity: 18, splice: ["Polka Dot Block", "Rose"]},
-			"Sheet Music: Flat Piano": {rarity: 15, splice: ["Sheet Music: Piano Note", "Rock"], fromStorePack: "Composer's Pack"},
-			"Sheet Music: Sharp Piano": {rarity: 22, splice: ["Sheet Music: Piano Note", "Death Spikes"], fromStorePack: "Composer's Pack"},
-			"Snorkel": {rarity: 15, splice: ["Bathtub", "Glass Pane"]},
-			"Street Sign": {rarity: 15, splice: ["Sidewalk", "Pointy Sign"]},
-			"Tangram Block": {rarity: 15, splice: ["Checker Wallpaper", "Grey Block"]},
-			"Tenement Building": {rarity: 11, splice: ["House Entrance", "Garbage"]},
-			"Tie Dyed Shirt": {rarity: 26, splice: ["Checker Wallpaper", "Polka Dot Block"]},
-			"TV Head": {rarity: 17, splice: ["Olde Timey Radio", "Wood Block"]},
-			"Wrought-Iron Fence": {rarity: 24, splice: ["Portcullis", "Pencil"]},
-			"Zombie-Stompin' Boots": {rarity: 15, splice: ["Grimstone", "Death Spikes"], fromStorePack: "Zombie Defense Pack"},
+			"Ancient Stone Gate": {rarity: 17, recipes: {splice: ["Portcullis", "Sandstone Wall"]}},
+			"Apple": {rarity: 19, recipes: {splice: ["Blueberry", "Red Bricks"], fromStorePack: "Education Pack"}},
+			"Barky's Mask": {rarity: 21, recipes: {splice: ["Barrel", "Painting: Yerfdog"]}},
+			"Baseball Bat": {rarity: 12, recipes: {splice: ["House Entrance", "Sign"]}},
+			"Bed": {rarity: 14, recipes: {splice: ["Wooden Chair", "Mushroom"]}},
+			"Big Old Down Arrow": {rarity: 13, recipes: {splice: ["Devil Horns", "Pointy Sign"], fromStorePack: "Racing Action Pack"}},
+			"Blue Block": {rarity: 15, recipes: {splice: ["Blueberry", "Bricks"]}},
+			"Brainwave Capacitor": {rarity: 21, recipes: {splice: ["Olde Timey Radio", "Yellow Block"]}},
+			"Bubble Wrap": {rarity: 14, recipes: {splice: ["Blueberry", "Glass Pane"]}},
+			"Gargoyle": {rarity: 16, recipes: {splice: ["Grimstone", "Devil Horns"]}},
+			"Grey Hair Bun": {rarity: 19, recipes: {splice: ["Olde Timey Radio", "Grey Block"]}},
+			"Just One Boxing Glove": {rarity: 16, recipes: {splice: ["Blueberry", "Red Block"]}},
+			"Lattice Background": {rarity: 15, recipes: {splice: ["Wooden Chair", "Wooden Background"]}},
+			"Long Black Hair": {rarity: 20, recipes: {splice: ["Portcullis", "Black Block"]}},
+			"Monster Feet": {rarity: 14, recipes: {splice: ["Devil Horns", "Green Block"]}},
+			"Pickaxe": {rarity: 17, recipes: {splice: ["Portcullis", "Cave Background"]}},
+			"Picket Fence": {rarity: 17, recipes: {splice: ["Wooden Chair", "White Block"]}},
+			"Plumbing": {rarity: 18, recipes: {splice: ["Bathtub", "Green Block"]}},
+			"Rubber Ducky": {rarity: 23, recipes: {splice: ["Bathtub", "Painting: Dink Duck"]}},
+			"Sandstone": {rarity: 18, recipes: {splice: ["Cactus", "Dirt"]}},
+			"School Desk": {rarity: 20, recipes: {splice: ["Wooden Chair", "Orange Block"], fromStorePack: "Education Pack"}},
+			"Seaweed": {rarity: 21, recipes: {splice: ["Water Bucket", "Bush"]}},
+			"Secret Passage": {rarity: 15, recipes: {splice: ["Wood Block", "Big Old Sideways Arrow"]}},
+			"Sexy Boxers": {rarity: 18, recipes: {splice: ["Polka Dot Block", "Rose"]}},
+			"Sheet Music: Flat Piano": {rarity: 15, recipes: {splice: ["Sheet Music: Piano Note", "Rock"], fromStorePack: "Composer's Pack"}},
+			"Sheet Music: Sharp Piano": {rarity: 22, recipes: {splice: ["Sheet Music: Piano Note", "Death Spikes"], fromStorePack: "Composer's Pack"}},
+			"Snorkel": {rarity: 15, recipes: {splice: ["Bathtub", "Glass Pane"]}},
+			"Street Sign": {rarity: 15, recipes: {splice: ["Sidewalk", "Pointy Sign"]}},
+			"Tangram Block": {rarity: 15, recipes: {splice: ["Checker Wallpaper", "Grey Block"]}},
+			"Tenement Building": {rarity: 11, recipes: {splice: ["House Entrance", "Garbage"]}},
+			"Tie Dyed Shirt": {rarity: 26, recipes: {splice: ["Checker Wallpaper", "Polka Dot Block"]}},
+			"TV Head": {rarity: 17, recipes: {splice: ["Olde Timey Radio", "Wood Block"]}},
+			"Wrought-Iron Fence": {rarity: 24, recipes: {splice: ["Portcullis", "Pencil"]}},
+			"Zombie-Stompin' Boots": {rarity: 15, recipes: {splice: ["Grimstone", "Death Spikes"], fromStorePack: "Zombie Defense Pack"}},
 			// GEN VIII
-			"Acid": {rarity: 35, splice: ["Plumbing", "Cactus"]},
-			"Antidote": {rarity: 31, splice: ["Apple", "Blueberry"], fromStorePack: "Zombie Defense Pack"},
-			"Backpack": {rarity: 17, splice: ["Bed", "Super Crate Box"]},
-			"Blue Star Wallpaper": {rarity: 18, splice: ["Blue Block", "Amber Glass"]},
-			"Checkered Pajamas": {rarity: 25, splice: ["Bed", "Checker Wallpaper"]},
-			"Copper Plumbing": {rarity: 27, splice: ["Plumbing", "Orange Block"]},
-			"Coral": {rarity: 22, splice: ["Seaweed", "Ocean Rock"]},
-			"Das Red Balloon": {rarity: 18, splice: ["Bubble Wrap", "Red Block"]},
-			"Dreamstone Block": {rarity: 23, splice: ["Bed", "Orange Block"]},
-			"Granite Block": {rarity: 23, splice: ["Sandstone", "Stone Wall"]},
-			"Iron Bars": {rarity: 26, splice: ["Plumbing", "Death Spikes"], fromStorePack: "Dungeon Pack"},
-			"Military Radio": {rarity: 36, splice: ["Sheet Music: Sharp Piano", "Biohazard Sign"], fromStorePack: "Zombie Defense Pack"},
-			"Music Box": {rarity: 38, splice: ["Rubber Ducky", "Olde Timey Radio"]},
-			"Note Block": {rarity: 30, splice: ["Blue Block", "Olde Timey Radio"]},
-			"Peg Leg": {rarity: 29, splice: ["Rubber Ducky", "Wooden Table"]},
-			"Pitchfork": {rarity: 27, splice: ["Wrought-Iron Fence", "Crappy Sign"], fromStorePack: "Farm Pack"},
-			"Purple Block": {rarity: 19, splice: ["Blue Block", "Red Block"]},
-			"Red Sweatpants": {rarity: 19, splice: ["Big Old Down Arrow", "White Block"], fromStorePack: "Racing Action Pack"},
-			"Screen Door": {rarity: 17, splice: ["Lattice Background", "Door"]},
-			"Sheet Music: Bass Note": {rarity: 24, splice: ["Blue Block", "Sheet Music: Blank"], fromStorePack: "Composer's Pack"},
-			"Ski Cap": {rarity: 18, splice: ["Blue Block", "Mushroom"]},
-			"Sugar Cane": {rarity: 24, splice: ["Seaweed", "Happy Joy Plaque"]},
-			"Swiss Cheese Block": {rarity: 21, splice: ["Bubble Wrap", "Pastel Yellow Block"]},
-			"Wall Like An Egyptian": {rarity: 22, splice: ["Sandstone", "Mud Glob"]},
+			"Acid": {rarity: 35, recipes: {splice: ["Plumbing", "Cactus"]}},
+			"Antidote": {rarity: 31, recipes: {splice: ["Apple", "Blueberry"], fromStorePack: "Zombie Defense Pack"}},
+			"Backpack": {rarity: 17, recipes: {splice: ["Bed", "Super Crate Box"]}},
+			"Blue Star Wallpaper": {rarity: 18, recipes: {splice: ["Blue Block", "Amber Glass"]}},
+			"Checkered Pajamas": {rarity: 25, recipes: {splice: ["Bed", "Checker Wallpaper"]}},
+			"Copper Plumbing": {rarity: 27, recipes: {splice: ["Plumbing", "Orange Block"]}},
+			"Coral": {rarity: 22, recipes: {splice: ["Seaweed", "Ocean Rock"]}},
+			"Das Red Balloon": {rarity: 18, recipes: {splice: ["Bubble Wrap", "Red Block"]}},
+			"Dreamstone Block": {rarity: 23, recipes: {splice: ["Bed", "Orange Block"]}},
+			"Granite Block": {rarity: 23, recipes: {splice: ["Sandstone", "Stone Wall"]}},
+			"Iron Bars": {rarity: 26, recipes: {splice: ["Plumbing", "Death Spikes"], fromStorePack: "Dungeon Pack"}},
+			"Military Radio": {rarity: 36, recipes: {splice: ["Sheet Music: Sharp Piano", "Biohazard Sign"], fromStorePack: "Zombie Defense Pack"}},
+			"Music Box": {rarity: 38, recipes: {splice: ["Rubber Ducky", "Olde Timey Radio"]}},
+			"Note Block": {rarity: 30, recipes: {splice: ["Blue Block", "Olde Timey Radio"]}},
+			"Peg Leg": {rarity: 29, recipes: {splice: ["Rubber Ducky", "Wooden Table"]}},
+			"Pitchfork": {rarity: 27, recipes: {splice: ["Wrought-Iron Fence", "Crappy Sign"], fromStorePack: "Farm Pack"}},
+			"Purple Block": {rarity: 19, recipes: {splice: ["Blue Block", "Red Block"]}},
+			"Red Sweatpants": {rarity: 19, recipes: {splice: ["Big Old Down Arrow", "White Block"], fromStorePack: "Racing Action Pack"}},
+			"Screen Door": {rarity: 17, recipes: {splice: ["Lattice Background", "Door"]}},
+			"Sheet Music: Bass Note": {rarity: 24, recipes: {splice: ["Blue Block", "Sheet Music: Blank"], fromStorePack: "Composer's Pack"}},
+			"Ski Cap": {rarity: 18, recipes: {splice: ["Blue Block", "Mushroom"]}},
+			"Sugar Cane": {rarity: 24, recipes: {splice: ["Seaweed", "Happy Joy Plaque"]}},
+			"Swiss Cheese Block": {rarity: 21, recipes: {splice: ["Bubble Wrap", "Pastel Yellow Block"]}},
+			"Wall Like An Egyptian": {rarity: 22, recipes: {splice: ["Sandstone", "Mud Glob"]}},
 			// GEN IX
-			"Big Old Up Arrow": {rarity: 22, splice: ["Das Red Balloon", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
-			"Card Block": {rarity: 33, splice: ["Das Red Balloon", "Tangram Block"], fromStorePack: "Vegas Pack"},
-			"Cloudstone Block": {rarity: 28, splice: ["Dreamstone Block", "Aqua Block"]},
-			"Emerald Block": {rarity: 135, splice: ["Acid", "Crystal Block"]},
-			"Jail Door": {rarity: 42, splice: ["Iron Bars", "Portcullis"]},
-			"Lollipop": {rarity: 31, splice: ["Purple Block", "Blueberry"]},
-			"Marble Block": {rarity: 46, splice: ["Dreamstone Block", "Granite Block"]},
-			"Monocle": {rarity: 44, splice: ["Music Box", "Window"]},
-			"Neon Lights": {rarity: 26, splice: ["Purple Block", "Glass Block"], fromStorePack: "Vegas Pack"},
-			"Palm Tree": {rarity: 28, splice: ["Wall Like An Egyptian", "Pastel Green Block"]},
-			"Poodle Skirt": {rarity: 41, splice: ["Das Red Balloon", "Dreamstone Block"]},
-			"Purple Bikini Top": {rarity: 22, splice: ["Purple Block", "Rose"]},
-			"Purple Mohawk": {rarity: 36, splice: ["Purple Block", "Picket Fence"]},
-			"Purple Thong": {rarity: 24, splice: ["Purple Block", "Danger Sign"]},
-			"Race Start Flag": {rarity: 22, splice: ["Blue Star Wallpaper", "Pointy Sign"], fromStorePack: "Racing Action Pack"},
-			"Rainbow Block": {rarity: 28, splice: ["Purple Block", "Orange Block"]},
-			"Ruby Block": {rarity: 123, splice: ["Dreamstone Block", "Crystal Block"]},
-			"Sheet Music: Flat Bass": {rarity: 25, splice: ["Sheet Music: Bass Note", "Rock"], fromStorePack: "Composer's Pack"},
-			"Sheet Music: Sharp Bass": {rarity: 32, splice: ["Sheet Music: Bass Note", "Death Spikes"], fromStorePack: "Composer's Pack"},
-			"Showgirl Headdress": {rarity: 34, splice: ["Blue Star Wallpaper", "Portcullis"], fromStorePack: "Vegas Pack"},
-			"Showgirl Leggings": {rarity: 33, splice: ["Blue Star Wallpaper", "Lattice Background"], fromStorePack: "Vegas Pack"},
-			"Steel Block": {rarity: 35, splice: ["Purple Block", "Portcullis"]},
-			"Stinky Bucket": {rarity: 32, splice: ["Swiss Cheese Block", "Barrel"]},
-			"Table Lamp": {rarity: 24, splice: ["Blue Star Wallpaper", "Wooden Table"]},
-			"Toxic Waste Barrel": {rarity: 46, splice: ["Acid", "Barrel"], fromStorePack: "Zombie Defense Pack"},
-			"Velvet Rope": {rarity: 40, splice: ["Copper Plumbing", "Big Old Sideways Arrow"]},
+			"Big Old Up Arrow": {rarity: 22, recipes: {splice: ["Das Red Balloon", "Pointy Sign"], fromStorePack: "Racing Action Pack"}},
+			"Card Block": {rarity: 33, recipes: {splice: ["Das Red Balloon", "Tangram Block"], fromStorePack: "Vegas Pack"}},
+			"Cloudstone Block": {rarity: 28, recipes: {splice: ["Dreamstone Block", "Aqua Block"]}},
+			"Emerald Block": {rarity: 135, recipes: {splice: ["Acid", "Crystal Block"]}},
+			"Jail Door": {rarity: 42, recipes: {splice: ["Iron Bars", "Portcullis"]}},
+			"Lollipop": {rarity: 31, recipes: {splice: ["Purple Block", "Blueberry"]}},
+			"Marble Block": {rarity: 46, recipes: {splice: ["Dreamstone Block", "Granite Block"]}},
+			"Monocle": {rarity: 44, recipes: {splice: ["Music Box", "Window"]}},
+			"Neon Lights": {rarity: 26, recipes: {splice: ["Purple Block", "Glass Block"], fromStorePack: "Vegas Pack"}},
+			"Palm Tree": {rarity: 28, recipes: {splice: ["Wall Like An Egyptian", "Pastel Green Block"]}},
+			"Poodle Skirt": {rarity: 41, recipes: {splice: ["Das Red Balloon", "Dreamstone Block"]}},
+			"Purple Bikini Top": {rarity: 22, recipes: {splice: ["Purple Block", "Rose"]}},
+			"Purple Mohawk": {rarity: 36, recipes: {splice: ["Purple Block", "Picket Fence"]}},
+			"Purple Thong": {rarity: 24, recipes: {splice: ["Purple Block", "Danger Sign"]}},
+			"Race Start Flag": {rarity: 22, recipes: {splice: ["Blue Star Wallpaper", "Pointy Sign"], fromStorePack: "Racing Action Pack"}},
+			"Rainbow Block": {rarity: 28, recipes: {splice: ["Purple Block", "Orange Block"]}},
+			"Ruby Block": {rarity: 123, recipes: {splice: ["Dreamstone Block", "Crystal Block"]}},
+			"Sheet Music: Flat Bass": {rarity: 25, recipes: {splice: ["Sheet Music: Bass Note", "Rock"], fromStorePack: "Composer's Pack"}},
+			"Sheet Music: Sharp Bass": {rarity: 32, recipes: {splice: ["Sheet Music: Bass Note", "Death Spikes"], fromStorePack: "Composer's Pack"}},
+			"Showgirl Headdress": {rarity: 34, recipes: {splice: ["Blue Star Wallpaper", "Portcullis"], fromStorePack: "Vegas Pack"}},
+			"Showgirl Leggings": {rarity: 33, recipes: {splice: ["Blue Star Wallpaper", "Lattice Background"], fromStorePack: "Vegas Pack"}},
+			"Steel Block": {rarity: 35, recipes: {splice: ["Purple Block", "Portcullis"]}},
+			"Stinky Bucket": {rarity: 32, recipes: {splice: ["Swiss Cheese Block", "Barrel"]}},
+			"Table Lamp": {rarity: 24, recipes: {splice: ["Blue Star Wallpaper", "Wooden Table"]}},
+			"Toxic Waste Barrel": {rarity: 46, recipes: {splice: ["Acid", "Barrel"], fromStorePack: "Zombie Defense Pack"}},
+			"Velvet Rope": {rarity: 40, recipes: {splice: ["Copper Plumbing", "Big Old Sideways Arrow"]}},
 			// GEN X
-			"Blue Wristband": {rarity: 34, splice: ["Race Start Flag", "Blueberry"], fromStorePack: "Racing Action Pack"},
-			"Bookcase": {rarity: 42, splice: ["Rainbow Block", "Dresser"]},
-			"Boombox": {rarity: 39, splice: ["Steel Block", "Black Block"]},
-			"Checkpoint": {rarity: 42, splice: ["Cloudstone Block", "Bubble Wrap"]},
-			"Clouds": {rarity: 35, splice: ["Cloudstone Block", "Glass Block"]},
-			"Farmgirl Hair": {rarity: 46, splice: ["Velvet Rope", "Poppy"], fromStorePack: "Farm Pack"},
-			"Golden Block": {rarity: 41, splice: ["Steel Block", "Yellow Block"]},
-			"Growsaber": {rarity: 126, splice: ["Neon Lights", "Crystal Block"]},
-			"Ice": {rarity: 30, splice: ["Cloudstone Block", "Glass Pane"]},
-			"Jetpack": {rarity: 36, splice: ["Steel Block", "Lava"]},
-			"Ladder": {rarity: 26, splice: ["Big Old Up Arrow", "Wooden Platform"]},
-			"Magic Bacon Wallpaper": {rarity: 38, splice: ["Rainbow Block", "House Entrance"]},
-			"Mailbox": {rarity: 57, splice: ["Steel Block", "Big Old Up Arrow"]},
-			"Password Door": {rarity: 77, splice: ["Jail Door", "Steel Block"]},
-			"Pinball Bumper": {rarity: 53, splice: ["Steel Block", "Blue Star Wallpaper"]},
-			"Plate Mail": {rarity: 51, splice: ["Steel Block", "Portcullis"]},
-			"Race End Flag": {rarity: 33, splice: ["Race Start Flag", "Checker Wallpaper"], fromStorePack: "Racing Action Pack"},
-			"Red Sportsball Jersey": {rarity: 28, splice: ["Big Old Up Arrow", "White Block"], fromStorePack: "Racing Action Pack"},
-			"Robot Wants Dubstep": {rarity: 65, splice: ["Steel Block", "Note Block"]},
-			"Roulette Wheel": {rarity: 51, splice: ["Card Block", "Cuzco Wall Mount"], fromStorePack: "Vegas Pack"},
-			"Science Station": {rarity: 82, splice: ["Toxic Waste Barrel", "Military Radio"], fromStorePack: "Mad Science Kit"},
-			"Steel Girder": {rarity: 50, splice: ["Steel Block", "Lattice Background"]},
-			"Streetlamp": {rarity: 44, splice: ["Neon Lights", "Plumbing"]},
-			"The Darkness": {rarity: 40, splice: ["Steel Block", "Evil Bricks"]},
+			"Blue Wristband": {rarity: 34, recipes: {splice: ["Race Start Flag", "Blueberry"], fromStorePack: "Racing Action Pack"}},
+			"Bookcase": {rarity: 42, recipes: {splice: ["Rainbow Block", "Dresser"]}},
+			"Boombox": {rarity: 39, recipes: {splice: ["Steel Block", "Black Block"]}},
+			"Checkpoint": {rarity: 42, recipes: {splice: ["Cloudstone Block", "Bubble Wrap"]}},
+			"Clouds": {rarity: 35, recipes: {splice: ["Cloudstone Block", "Glass Block"]}},
+			"Farmgirl Hair": {rarity: 46, recipes: {splice: ["Velvet Rope", "Poppy"], fromStorePack: "Farm Pack"}},
+			"Golden Block": {rarity: 41, recipes: {splice: ["Steel Block", "Yellow Block"]}},
+			"Growsaber": {rarity: 126, recipes: {splice: ["Neon Lights", "Crystal Block"]}},
+			"Ice": {rarity: 30, recipes: {splice: ["Cloudstone Block", "Glass Pane"]}},
+			"Jetpack": {rarity: 36, recipes: {splice: ["Steel Block", "Lava"]}},
+			"Ladder": {rarity: 26, recipes: {splice: ["Big Old Up Arrow", "Wooden Platform"]}},
+			"Magic Bacon Wallpaper": {rarity: 38, recipes: {splice: ["Rainbow Block", "House Entrance"]}},
+			"Mailbox": {rarity: 57, recipes: {splice: ["Steel Block", "Big Old Up Arrow"]}},
+			"Password Door": {rarity: 77, recipes: {splice: ["Jail Door", "Steel Block"]}},
+			"Pinball Bumper": {rarity: 53, recipes: {splice: ["Steel Block", "Blue Star Wallpaper"]}},
+			"Plate Mail": {rarity: 51, recipes: {splice: ["Steel Block", "Portcullis"]}},
+			"Race End Flag": {rarity: 33, recipes: {splice: ["Race Start Flag", "Checker Wallpaper"], fromStorePack: "Racing Action Pack"}},
+			"Red Sportsball Jersey": {rarity: 28, recipes: {splice: ["Big Old Up Arrow", "White Block"], fromStorePack: "Racing Action Pack"}},
+			"Robot Wants Dubstep": {rarity: 65, recipes: {splice: ["Steel Block", "Note Block"]}},
+			"Roulette Wheel": {rarity: 51, recipes: {splice: ["Card Block", "Cuzco Wall Mount"], fromStorePack: "Vegas Pack"}},
+			"Science Station": {rarity: 82, recipes: {splice: ["Toxic Waste Barrel", "Military Radio"], fromStorePack: "Mad Science Kit"}},
+			"Steel Girder": {rarity: 50, recipes: {splice: ["Steel Block", "Lattice Background"]}},
+			"Streetlamp": {rarity: 44, recipes: {splice: ["Neon Lights", "Plumbing"]}},
+			"The Darkness": {rarity: 40, recipes: {splice: ["Steel Block", "Evil Bricks"]}},
 			// GEN XI
-			"Air Robinsons": {rarity: 47, splice: ["Race End Flag", "Bubble Wrap"], fromStorePack: "Racing Action Pack"},
-			"Aqua Wallpaper": {rarity: 43, splice: ["Magic Bacon Wallpaper", "Aqua Block"]},
-			"Art Wall": {rarity: 66, splice: ["Magic Bacon Wallpaper", "Rainbow Block"]},
-			"Baneful Mask": {rarity: 58, splice: ["The Darkness", "Plumbing"]},
-			"Blackrock Wall": {rarity: 42, splice: ["The Darkness", "Lava Rock"], fromStorePack: "Dungeon Pack"},
-			"Blue Mailbox": {rarity: 72, splice: ["Mailbox", "Blue Block"], fromStorePack: "City Pack"},
-			"Blue Wallpaper": {rarity: 53, splice: ["Magic Bacon Wallpaper", "Blue Block"]},
-			"Chicken": {rarity: 58, splice: ["Clouds", "Rubber Ducky"], fromStorePack: "Farm Pack"},
-			"Cybernetic Arm": {rarity: 89, splice: ["Steel Girder", "Boombox"]},
-			"Diamond Ring": {rarity: 141, splice: ["Golden Block", "Crystal Block"]},
-			"Disco Ball": {rarity: 45, splice: ["Boombox", "Window"]},
-			"Elvish Longbow": {rarity: 39, splice: ["Ladder", "Big Old Sideways Arrow"], fromStorePack: "Fantasy Pack"},
-			"Fire Escape": {rarity: 76, splice: ["Steel Girder", "Ladder"], fromStorePack: "City Pack"},
-			"Fireplace": {rarity: 46, splice: ["Golden Block", "Evil Bricks"]},
-			"Fishbowl": {rarity: 40, splice: ["Ice", "Wooden Window"]},
-			"Fishnet Stockings": {rarity: 79, splice: ["The Darkness", "Boombox"]},
-			"Flipping Coin": {rarity: 54, splice: ["Golden Block", "Sheet Music: Drums"], fromStorePack: "Vegas Pack"},
-			"Golden Sword": {rarity: 58, splice: ["Golden Block", "Picket Fence"], fromStorePack: "Fantasy Pack"},
-			"Green Wallpaper": {rarity: 43, splice: ["Magic Bacon Wallpaper", "Green Block"]},
-			"Grey Wallpaper": {rarity: 42, splice: ["Magic Bacon Wallpaper", "Grey Block"]},
-			"GrowBeats Headphones": {rarity: 69, splice: ["Boombox", "Note Block"]},
-			"High Tech Block": {rarity: 69, splice: ["Robot Wants Dubstep", "Grey Block"]},
-			"High Tech Wall": {rarity: 69, splice: ["Robot Wants Dubstep", "Black Block"]},
-			"Ninja Mask": {rarity: 44, splice: ["The Darkness", "Black Block"]},
-			"Ninja Slippers": {rarity: 44, splice: ["The Darkness", "Brown Block"]},
-			"Ninja Tights": {rarity: 59, splice: ["The Darkness", "Purple Block"]},
-			"Ninja Vest": {rarity: 55, splice: ["The Darkness", "Blue Block"]},
-			"Orange Wallpaper": {rarity: 47, splice: ["Magic Bacon Wallpaper", "Orange Block"]},
-			"Pinball Sproinger": {rarity: 56, splice: ["Pinball Bumper", "Mushroom"]},
-			"Purple Wallpaper": {rarity: 57, splice: ["Magic Bacon Wallpaper", "Purple Block"]},
-			"Red Wallpaper": {rarity: 42, splice: ["Magic Bacon Wallpaper", "Red Block"]},
-			"Showgirl Top": {rarity: 48, splice: ["Ice", "Blue Star Wallpaper"], fromStorePack: "Vegas Pack"},
-			"Traffic Barricade": {rarity: 50, splice: ["Ladder", "Table Lamp"], fromStorePack: "Zombie Defense Pack"},
-			"Treasure Chest": {rarity: 55, splice: ["Golden Block", "Dresser"], fromStorePack: "Fantasy Pack"},
-			"Venus Guytrap": {rarity: 41, splice: ["Magic Bacon Wallpaper", "Daisy"]},
-			"Wizard Hat": {rarity: 65, splice: ["Bookcase", "Dreamstone Block"], fromStorePack: "Fantasy Pack"},
-			"Yellow Wallpaper": {rarity: 44, splice: ["Magic Bacon Wallpaper", "Yellow Block"]},
+			"Air Robinsons": {rarity: 47, recipes: {splice: ["Race End Flag", "Bubble Wrap"], fromStorePack: "Racing Action Pack"}},
+			"Aqua Wallpaper": {rarity: 43, recipes: {splice: ["Magic Bacon Wallpaper", "Aqua Block"]}},
+			"Art Wall": {rarity: 66, recipes: {splice: ["Magic Bacon Wallpaper", "Rainbow Block"]}},
+			"Baneful Mask": {rarity: 58, recipes: {splice: ["The Darkness", "Plumbing"]}},
+			"Blackrock Wall": {rarity: 42, recipes: {splice: ["The Darkness", "Lava Rock"], fromStorePack: "Dungeon Pack"}},
+			"Blue Mailbox": {rarity: 72, recipes: {splice: ["Mailbox", "Blue Block"], fromStorePack: "City Pack"}},
+			"Blue Wallpaper": {rarity: 53, recipes: {splice: ["Magic Bacon Wallpaper", "Blue Block"]}},
+			"Chicken": {rarity: 58, recipes: {splice: ["Clouds", "Rubber Ducky"], fromStorePack: "Farm Pack"}},
+			"Cybernetic Arm": {rarity: 89, recipes: {splice: ["Steel Girder", "Boombox"]}},
+			"Diamond Ring": {rarity: 141, recipes: {splice: ["Golden Block", "Crystal Block"]}},
+			"Disco Ball": {rarity: 45, recipes: {splice: ["Boombox", "Window"]}},
+			"Elvish Longbow": {rarity: 39, recipes: {splice: ["Ladder", "Big Old Sideways Arrow"], fromStorePack: "Fantasy Pack"}},
+			"Fire Escape": {rarity: 76, recipes: {splice: ["Steel Girder", "Ladder"], fromStorePack: "City Pack"}},
+			"Fireplace": {rarity: 46, recipes: {splice: ["Golden Block", "Evil Bricks"]}},
+			"Fishbowl": {rarity: 40, recipes: {splice: ["Ice", "Wooden Window"]}},
+			"Fishnet Stockings": {rarity: 79, recipes: {splice: ["The Darkness", "Boombox"]}},
+			"Flipping Coin": {rarity: 54, recipes: {splice: ["Golden Block", "Sheet Music: Drums"], fromStorePack: "Vegas Pack"}},
+			"Golden Sword": {rarity: 58, recipes: {splice: ["Golden Block", "Picket Fence"], fromStorePack: "Fantasy Pack"}},
+			"Green Wallpaper": {rarity: 43, recipes: {splice: ["Magic Bacon Wallpaper", "Green Block"]}},
+			"Grey Wallpaper": {rarity: 42, recipes: {splice: ["Magic Bacon Wallpaper", "Grey Block"]}},
+			"GrowBeats Headphones": {rarity: 69, recipes: {splice: ["Boombox", "Note Block"]}},
+			"High Tech Block": {rarity: 69, recipes: {splice: ["Robot Wants Dubstep", "Grey Block"]}},
+			"High Tech Wall": {rarity: 69, recipes: {splice: ["Robot Wants Dubstep", "Black Block"]}},
+			"Ninja Mask": {rarity: 44, recipes: {splice: ["The Darkness", "Black Block"]}},
+			"Ninja Slippers": {rarity: 44, recipes: {splice: ["The Darkness", "Brown Block"]}},
+			"Ninja Tights": {rarity: 59, recipes: {splice: ["The Darkness", "Purple Block"]}},
+			"Ninja Vest": {rarity: 55, recipes: {splice: ["The Darkness", "Blue Block"]}},
+			"Orange Wallpaper": {rarity: 47, recipes: {splice: ["Magic Bacon Wallpaper", "Orange Block"]}},
+			"Pinball Sproinger": {rarity: 56, recipes: {splice: ["Pinball Bumper", "Mushroom"]}},
+			"Purple Wallpaper": {rarity: 57, recipes: {splice: ["Magic Bacon Wallpaper", "Purple Block"]}},
+			"Red Wallpaper": {rarity: 42, recipes: {splice: ["Magic Bacon Wallpaper", "Red Block"]}},
+			"Showgirl Top": {rarity: 48, recipes: {splice: ["Ice", "Blue Star Wallpaper"], fromStorePack: "Vegas Pack"}},
+			"Traffic Barricade": {rarity: 50, recipes: {splice: ["Ladder", "Table Lamp"], fromStorePack: "Zombie Defense Pack"}},
+			"Treasure Chest": {rarity: 55, recipes: {splice: ["Golden Block", "Dresser"], fromStorePack: "Fantasy Pack"}},
+			"Venus Guytrap": {rarity: 41, recipes: {splice: ["Magic Bacon Wallpaper", "Daisy"]}},
+			"Wizard Hat": {rarity: 65, recipes: {splice: ["Bookcase", "Dreamstone Block"], fromStorePack: "Fantasy Pack"}},
+			"Yellow Wallpaper": {rarity: 44, recipes: {splice: ["Magic Bacon Wallpaper", "Yellow Block"]}},
 			// GEN XII
-			"Achievement Block": {rarity: 68, splice: ["Art Wall", "Wood Block"]},
-			"Blue Portal": {rarity: 84, splice: ["High Tech Block", "Blue Block"]},
-			"Cannon": {rarity: 50, splice: ["Fireplace", "Black Block"]},
-			"Chalkboard": {rarity: 52, splice: ["Grey Wallpaper", "Painting: Yerfdog"], fromStorePack: "Education Pack"},
-			"Chandelier": {rarity: 87, splice: ["Fireplace", "Golden Block"]},
-			"Combat Vest": {rarity: 86, splice: ["Green Wallpaper", "Aqua Wallpaper"], fromStorePack: "Zombie Defense Pack"},
-			"Crimson Eagle Wings": {rarity: 95, splice: ["Red Wallpaper", "Blue Wallpaper"]},
-			"Dice Block": {rarity: 70, splice: ["Art Wall", "Grey Block"], fromStorePack: "Vegas Pack"},
-			"Dragon Gate": {rarity: 57, splice: ["Venus Guytrap", "Portcullis"], fromStorePack: "Fantasy Pack"},
-			"Fairy Crown": {rarity: 47, splice: ["Disco Ball", "Grass"]},
-			"Fairy Dress": {rarity: 50, splice: ["Disco Ball", "Aqua Block"]},
-			"Fairy Skirt": {rarity: 48, splice: ["Disco Ball", "Daisy"]},
-			"Fairy Slippers": {rarity: 51, splice: ["Disco Ball", "Poppy"]},
-			"Fairy Wand": {rarity: 47, splice: ["Disco Ball", "Wood Block"]},
-			"Fairy Wings": {rarity: 52, splice: ["Disco Ball", "Flowery Wallpaper"]},
-			"Fire Hydrant": {rarity: 54, splice: ["Red Wallpaper", "Water Bucket"], fromStorePack: "City Pack"},
-			"Golden Halo": {rarity: 51, splice: ["Disco Ball", "Yellow Block"]},
-			"Gothic Building": {rarity: 89, splice: ["Blackrock Wall", "Orange Wallpaper"]},
-			"Hammer Pants": {rarity: 72, splice: ["Purple Wallpaper", "Tangram Block"]},
-			"Mystery Block": {rarity: 80, splice: ["Disco Ball", "Steel Block"]},
-			"Orange Portal": {rarity: 78, splice: ["High Tech Wall", "Orange Block"]},
-			"Overalls": {rarity: 64, splice: ["Blue Wallpaper", "Barrel"], fromStorePack: "Farm Pack"},
-			"Rainbow Wig": {rarity: 74, splice: ["Fireplace", "Rainbow Block"]},
-			"Refrigerator": {rarity: 85, splice: ["Treasure Chest", "Ice"]},
-			"Ruby Slippers": {rarity: 49, splice: ["Disco Ball", "Red Block"]},
-			"Sack O' Joy": {rarity: 75, splice: ["Disco Ball", "Note Block"]},
-			"Saturday Night Vest": {rarity: 86, splice: ["Disco Ball", "Golden Block"]},
-			"Skeleton": {rarity: 72, splice: ["Grey Wallpaper", "Ice"]},
-			"Slot Machine": {rarity: 95, splice: ["Yellow Wallpaper", "Roulette Wheel"], fromStorePack: "Vegas Pack"},
-			"Space Helmet": {rarity: 82, splice: ["Fishbowl", "Checkpoint"]},
-			"Sproingy Eyes": {rarity: 75, splice: ["Pinball Sproinger", "Apple"]},
-			"Stove": {rarity: 70, splice: ["High Tech Block", "Lava"]},
-			"Time-Space Rupture": {rarity: 79, splice: ["High Tech Wall", "House Entrance"]},
-			"White Bellbottoms": {rarity: 51, splice: ["Disco Ball", "White Block"]},
-			"Wizard's Robe": {rarity: 60, splice: ["Purple Wallpaper", "Happy Joy Plaque"], fromStorePack: "Fantasy Pack"},
-			"Zeta Reticulant Mask": {rarity: 78, splice: ["Grey Wallpaper", "Military Radio"]},
+			"Achievement Block": {rarity: 68, recipes: {splice: ["Art Wall", "Wood Block"]}},
+			"Blue Portal": {rarity: 84, recipes: {splice: ["High Tech Block", "Blue Block"]}},
+			"Cannon": {rarity: 50, recipes: {splice: ["Fireplace", "Black Block"]}},
+			"Chalkboard": {rarity: 52, recipes: {splice: ["Grey Wallpaper", "Painting: Yerfdog"], fromStorePack: "Education Pack"}},
+			"Chandelier": {rarity: 87, recipes: {splice: ["Fireplace", "Golden Block"]}},
+			"Combat Vest": {rarity: 86, recipes: {splice: ["Green Wallpaper", "Aqua Wallpaper"], fromStorePack: "Zombie Defense Pack"}},
+			"Crimson Eagle Wings": {rarity: 95, recipes: {splice: ["Red Wallpaper", "Blue Wallpaper"]}},
+			"Dice Block": {rarity: 70, recipes: {splice: ["Art Wall", "Grey Block"], fromStorePack: "Vegas Pack"}},
+			"Dragon Gate": {rarity: 57, recipes: {splice: ["Venus Guytrap", "Portcullis"], fromStorePack: "Fantasy Pack"}},
+			"Fairy Crown": {rarity: 47, recipes: {splice: ["Disco Ball", "Grass"]}},
+			"Fairy Dress": {rarity: 50, recipes: {splice: ["Disco Ball", "Aqua Block"]}},
+			"Fairy Skirt": {rarity: 48, recipes: {splice: ["Disco Ball", "Daisy"]}},
+			"Fairy Slippers": {rarity: 51, recipes: {splice: ["Disco Ball", "Poppy"]}},
+			"Fairy Wand": {rarity: 47, recipes: {splice: ["Disco Ball", "Wood Block"]}},
+			"Fairy Wings": {rarity: 52, recipes: {splice: ["Disco Ball", "Flowery Wallpaper"]}},
+			"Fire Hydrant": {rarity: 54, recipes: {splice: ["Red Wallpaper", "Water Bucket"], fromStorePack: "City Pack"}},
+			"Golden Halo": {rarity: 51, recipes: {splice: ["Disco Ball", "Yellow Block"]}},
+			"Gothic Building": {rarity: 89, recipes: {splice: ["Blackrock Wall", "Orange Wallpaper"]}},
+			"Hammer Pants": {rarity: 72, recipes: {splice: ["Purple Wallpaper", "Tangram Block"]}},
+			"Mystery Block": {rarity: 80, recipes: {splice: ["Disco Ball", "Steel Block"]}},
+			"Orange Portal": {rarity: 78, recipes: {splice: ["High Tech Wall", "Orange Block"]}},
+			"Overalls": {rarity: 64, recipes: {splice: ["Blue Wallpaper", "Barrel"], fromStorePack: "Farm Pack"}},
+			"Rainbow Wig": {rarity: 74, recipes: {splice: ["Fireplace", "Rainbow Block"]}},
+			"Refrigerator": {rarity: 85, recipes: {splice: ["Treasure Chest", "Ice"]}},
+			"Ruby Slippers": {rarity: 49, recipes: {splice: ["Disco Ball", "Red Block"]}},
+			"Sack O' Joy": {rarity: 75, recipes: {splice: ["Disco Ball", "Note Block"]}},
+			"Saturday Night Vest": {rarity: 86, recipes: {splice: ["Disco Ball", "Golden Block"]}},
+			"Skeleton": {rarity: 72, recipes: {splice: ["Grey Wallpaper", "Ice"]}},
+			"Slot Machine": {rarity: 95, recipes: {splice: ["Yellow Wallpaper", "Roulette Wheel"], fromStorePack: "Vegas Pack"}},
+			"Space Helmet": {rarity: 82, recipes: {splice: ["Fishbowl", "Checkpoint"]}},
+			"Sproingy Eyes": {rarity: 75, recipes: {splice: ["Pinball Sproinger", "Apple"]}},
+			"Stove": {rarity: 70, recipes: {splice: ["High Tech Block", "Lava"]}},
+			"Time-Space Rupture": {rarity: 79, recipes: {splice: ["High Tech Wall", "House Entrance"]}},
+			"White Bellbottoms": {rarity: 51, recipes: {splice: ["Disco Ball", "White Block"]}},
+			"Wizard's Robe": {rarity: 60, recipes: {splice: ["Purple Wallpaper", "Happy Joy Plaque"], fromStorePack: "Fantasy Pack"}},
+			"Zeta Reticulant Mask": {rarity: 78, recipes: {splice: ["Grey Wallpaper", "Military Radio"]}},
 			// GEN XIII
-			"Apron": {rarity: 81, splice: ["Stove", "Checker Wallpaper"]},
-			"Art Deco Block": {rarity: 83, splice: ["Time-Space Rupture", "Grey Block"], fromStorePack: "Gangland Style"},
-			"Blueberry Pie": {rarity: 82, splice: ["Stove", "Blueberry"]},
-			"Bulletin Board": {rarity: 67, splice: ["Chalkboard", "Lattice Background"], fromStorePack: "Education Pack"},
-			"Chef Hat": {rarity: 73, splice: ["Stove", "Mushroom"]},
-			"Cigar": {rarity: 81, splice: ["Time-Space Rupture", "Lava Rock"], fromStorePack: "Gangland Style"},
-			"Cow": {rarity: 89, splice: ["Refrigerator", "Brown Block"], fromStorePack: "Farm Pack"},
-			"Dame's Fedora": {rarity: 85, splice: ["Time-Space Rupture", "Poppy"], fromStorePack: "Gangland Style"},
-			"E-Z Cook Oven": {rarity: 75, splice: ["Stove", "Pastel Pink Block"]},
-			"Eyepatch": {rarity: 68, splice: ["Cannon", "Cuzco Wall Mount"]},
-			"Fedora": {rarity: 83, splice: ["Time-Space Rupture", "Black Block"], fromStorePack: "Gangland Style"},
-			"Flaming Skull Mask": {rarity: 75, splice: ["Skeleton", "Torch"]},
-			"Flapper Dress": {rarity: 80, splice: ["Time-Space Rupture", "Lava"], fromStorePack: "Gangland Style"},
-			"Flapper Headband": {rarity: 82, splice: ["Time-Space Rupture", "Daisy"], fromStorePack: "Gangland Style"},
-			"Headsman's Axe": {rarity: 65, splice: ["Dragon Gate", "Pencil"], fromStorePack: "Dungeon Pack"},
-			"Hoop Earrings": {rarity: 57, splice: ["Golden Halo", "Poppy"]},
-			"Laboratory": {rarity: 99, splice: ["Refrigerator", "Biohazard Sign"], fromStorePack: "Mad Science Kit"},
-			"Pinstripe Pants": {rarity: 89, splice: ["Time-Space Rupture", "Stripey Wallpaper"], fromStorePack: "Gangland Style"},
-			"Pinstripe Suit": {rarity: 82, splice: ["Time-Space Rupture", "Rose"], fromStorePack: "Gangland Style"},
-			"Pirate Hat": {rarity: 53, splice: ["Cannon", "Mushroom"]},
-			"Ripper Wings": {rarity: 96, splice: ["Chandelier", "Devil Horns"]},
-			"Spatula": {rarity: 87, splice: ["Stove", "Picket Fence"]},
-			"Straw Hat": {rarity: 54, splice: ["Golden Halo", "Wheat"], fromStorePack: "Farm Pack"},
-			"Tombstone": {rarity: 95, splice: ["Skeleton", "Granite Block"], fromStorePack: "Zombie Defense Pack"},
-			"Tommygun": {rarity: 87, splice: ["Time-Space Rupture", "Death Spikes"], fromStorePack: "Gangland Style"},
-			"Victrola": {rarity: 94, splice: ["Time-Space Rupture", "Olde Timey Radio"], fromStorePack: "Gangland Style"},
+			"Apron": {rarity: 81, recipes: {splice: ["Stove", "Checker Wallpaper"]}},
+			"Art Deco Block": {rarity: 83, recipes: {splice: ["Time-Space Rupture", "Grey Block"], fromStorePack: "Gangland Style"}},
+			"Blueberry Pie": {rarity: 82, recipes: {splice: ["Stove", "Blueberry"]}},
+			"Bulletin Board": {rarity: 67, recipes: {splice: ["Chalkboard", "Lattice Background"], fromStorePack: "Education Pack"}},
+			"Chef Hat": {rarity: 73, recipes: {splice: ["Stove", "Mushroom"]}},
+			"Cigar": {rarity: 81, recipes: {splice: ["Time-Space Rupture", "Lava Rock"], fromStorePack: "Gangland Style"}},
+			"Cow": {rarity: 89, recipes: {splice: ["Refrigerator", "Brown Block"], fromStorePack: "Farm Pack"}},
+			"Dame's Fedora": {rarity: 85, recipes: {splice: ["Time-Space Rupture", "Poppy"], fromStorePack: "Gangland Style"}},
+			"E-Z Cook Oven": {rarity: 75, recipes: {splice: ["Stove", "Pastel Pink Block"]}},
+			"Eyepatch": {rarity: 68, recipes: {splice: ["Cannon", "Cuzco Wall Mount"]}},
+			"Fedora": {rarity: 83, recipes: {splice: ["Time-Space Rupture", "Black Block"], fromStorePack: "Gangland Style"}},
+			"Flaming Skull Mask": {rarity: 75, recipes: {splice: ["Skeleton", "Torch"]}},
+			"Flapper Dress": {rarity: 80, recipes: {splice: ["Time-Space Rupture", "Lava"], fromStorePack: "Gangland Style"}},
+			"Flapper Headband": {rarity: 82, recipes: {splice: ["Time-Space Rupture", "Daisy"], fromStorePack: "Gangland Style"}},
+			"Headsman's Axe": {rarity: 65, recipes: {splice: ["Dragon Gate", "Pencil"], fromStorePack: "Dungeon Pack"}},
+			"Hoop Earrings": {rarity: 57, recipes: {splice: ["Golden Halo", "Poppy"]}},
+			"Laboratory": {rarity: 99, recipes: {splice: ["Refrigerator", "Biohazard Sign"], fromStorePack: "Mad Science Kit"}},
+			"Pinstripe Pants": {rarity: 89, recipes: {splice: ["Time-Space Rupture", "Stripey Wallpaper"], fromStorePack: "Gangland Style"}},
+			"Pinstripe Suit": {rarity: 82, recipes: {splice: ["Time-Space Rupture", "Rose"], fromStorePack: "Gangland Style"}},
+			"Pirate Hat": {rarity: 53, recipes: {splice: ["Cannon", "Mushroom"]}},
+			"Ripper Wings": {rarity: 96, recipes: {splice: ["Chandelier", "Devil Horns"]}},
+			"Spatula": {rarity: 87, recipes: {splice: ["Stove", "Picket Fence"]}},
+			"Straw Hat": {rarity: 54, recipes: {splice: ["Golden Halo", "Wheat"], fromStorePack: "Farm Pack"}},
+			"Tombstone": {rarity: 95, recipes: {splice: ["Skeleton", "Granite Block"], fromStorePack: "Zombie Defense Pack"}},
+			"Tommygun": {rarity: 87, recipes: {splice: ["Time-Space Rupture", "Death Spikes"], fromStorePack: "Gangland Style"}},
+			"Victrola": {rarity: 94, recipes: {splice: ["Time-Space Rupture", "Olde Timey Radio"], fromStorePack: "Gangland Style"}},
 			// GEN XIV
-			"Scoreboard": {rarity: 91, splice: ["Bulletin Board", "Table Lamp"]},
-			"Tavern Sign": {rarity: 85, splice: ["Art Deco Block", "Sign"], fromStorePack: "Fantasy Pack"},
+			"Scoreboard": {rarity: 91, recipes: {splice: ["Bulletin Board", "Table Lamp"]}},
+			"Tavern Sign": {rarity: 85, recipes: {splice: ["Art Deco Block", "Sign"], fromStorePack: "Fantasy Pack"}},
 
 			// Chemicals
-			"Chemical G": {rarity: 1, fromProvider: "Science Station", fromStorePack: "Mad Science Kit"},
-			"Chemical R": {rarity: 10, fromProvider: "Science Station", fromStorePack: "Mad Science Kit"},
-			"Chemical Y": {rarity: 15, fromProvider: "Science Station", fromStorePack: "Mad Science Kit"},
-			"Chemical B": {rarity: 25, fromProvider: "Science Station", fromStorePack: "Mad Science Kit"},
-			"Chemical P": {rarity: 50, fromProvider: "Science Station", fromStorePack: "Mad Science Kit"},
-			"Mysterious Chemical": {rarity: 90, chemicalCombine: {count: 1, ingredients: {"Chemical Y": 20, "Chemical B": 10, "Chemical P": 5}}},
-			"Haunted Chemical": {fromGrowganoth: ["Chemical G", "Chemical R", "Chemical Y", "Chemical B", "Chemical P"]},
-			"Unearthly Chemical": {rarity: 59, availableDuringEvent: "Night Of The Comet", splice: ["Starseed", "Glowy Block"]},
-			"Radioactive Chemical": {geigerReward: "Geiger Counter"},
-			"Synthetic Chemical": {minigameReward: "Chemsynth"},
+			"Chemical G": {rarity: 1, recipes: {fromProvider: "Science Station", fromStorePack: "Mad Science Kit"}},
+			"Chemical R": {rarity: 10, recipes: {fromProvider: "Science Station", fromStorePack: "Mad Science Kit"}},
+			"Chemical Y": {rarity: 15, recipes: {fromProvider: "Science Station", fromStorePack: "Mad Science Kit"}},
+			"Chemical B": {rarity: 25, recipes: {fromProvider: "Science Station", fromStorePack: "Mad Science Kit"}},
+			"Chemical P": {rarity: 50, recipes: {fromProvider: "Science Station", fromStorePack: "Mad Science Kit"}},
+			"Mysterious Chemical": {rarity: 90, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical Y": 20, "Chemical B": 10, "Chemical P": 5}}}},
+			"Haunted Chemical": {recipes: {fromGrowganoth: ["Chemical G", "Chemical R", "Chemical Y", "Chemical B", "Chemical P"]}},
+			"Unearthly Chemical": {rarity: 59, recipes: {availableDuringEvent: "Night Of The Comet", splice: ["Starseed", "Glowy Block"]}},
+			"Radioactive Chemical": {recipes: {geigerReward: "Geiger Counter"}},
+			"Synthetic Chemical": {recipes: {minigameReward: "Chemsynth"}},
 			
-			"Combover": {rarity: 26, fromStorePack: "Mad Science Kit", chemicalCombine: {count: 1, ingredients: {"Chemical G": 5, "Chemical R": 5, "Chemical Y": 10}}},
-			"Shocking Hair": {rarity: 36, chemicalCombine: {count: 1, ingredients: {"Chemical G": 30, "Chemical R": 4, "Chemical B": 1}}},
-			"Shockinator": {rarity: 61, chemicalCombine: {count: 3, ingredients: {"Chemical G": 10, "Chemical R": 5, "Chemical P": 1}}},
-			"Steel Table": {rarity: 41, chemicalCombine: {count: 5, ingredients: {"Chemical G": 5, "Chemical Y": 4, "Chemical B": 2}}},
-			"Dragon Tail": {rarity: 66, chemicalCombine: {count: 1, ingredients: {"Chemical G": 6, "Chemical Y": 3, "Chemical P": 4}}},
-			"Slime": {rarity: 76, chemicalCombine: {count: 4, ingredients: {"Chemical G": 15, "Chemical B": 4, "Chemical P": 2}}},
-			"Glowing Nose": {rarity: 50, availableDuringEvent: "Winterfest", chemicalCombine: {count: 1, ingredients: {"Chemical R": 10, "Chemical Y": 12, "Chemical B": 4}}},
-			"Lab Coat": {rarity: 75, fromStorePack: "Mad Science Kit", chemicalCombine: {count: 1, ingredients: {"Chemical R": 10, "Chemical Y": 3, "Chemical P": 3}}},
-			"Ze Goggles": {rarity: 85, fromStorePack: "Mad Science Kit", chemicalCombine: {count: 1, ingredients: {"Chemical R": 4, "Chemical B": 2, "Chemical P": 3}}},
-			"Forcefield": {rarity: 101, chemicalCombine: {count: 1, ingredients: {"Chemical G": 20, "Chemical R": 10, "Mysterious Chemical": 1}}, fromStorePack: "Astro Pack"},
-			// "": {rarity: 0, chemicalCombine: {count: 1, ingredients: {"Chemical G": 0, "Chemical Y": 0, "Mysterious Chemical": 0}}},
-			"Fuel Pack": {rarity: 116, chemicalCombine: {count: 5, ingredients: {"Chemical G": 10, "Chemical B": 2, "Mysterious Chemical": 1}}},
-			"Battle Trout": {rarity: 141, chemicalCombine: {count: 1, ingredients: {"Chemical G": 20, "Chemical P": 15, "Mysterious Chemical": 10}}},
-			"Sassy Boots": {rarity: 115, chemicalCombine: {count: 1, ingredients: {"Chemical R": 8, "Chemical Y": 4, "Mysterious Chemical": 1}}},
-			// "": {rarity: 0, chemicalCombine: {count: 1, ingredients: {"Chemical R": 0, "Chemical B": 0, "Mysterious Chemical": 0}}},
-			"Block Glue": {chemicalCombine: {count: 2, ingredients: {"Chemical R": 1, "Chemical P": 1, "Mysterious Chemical": 1}}},
-			"Enhanced Intellect": {rarity: 130, chemicalCombine: {count: 1, ingredients: {"Chemical Y": 3, "Chemical B": 3, "Mysterious Chemical": 3}}},
-			"Thingamajig": {rarity: 155, chemicalCombine: {count: 1, ingredients: {"Chemical Y": 4, "Chemical P": 3, "Mysterious Chemical": 1}}},
-			"Reanimator Remote": {rarity: 200, chemicalCombine: {count: 1, ingredients: {"Chemical B": 200, "Chemical P": 200, "Mysterious Chemical": 200}}},
+			"Combover": {rarity: 26, recipes: {fromStorePack: "Mad Science Kit", chemicalCombine: {count: 1, ingredients: {"Chemical G": 5, "Chemical R": 5, "Chemical Y": 10}}}},
+			"Shocking Hair": {rarity: 36, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical G": 30, "Chemical R": 4, "Chemical B": 1}}}},
+			"Shockinator": {rarity: 61, recipes: {chemicalCombine: {count: 3, ingredients: {"Chemical G": 10, "Chemical R": 5, "Chemical P": 1}}}},
+			"Steel Table": {rarity: 41, recipes: {chemicalCombine: {count: 5, ingredients: {"Chemical G": 5, "Chemical Y": 4, "Chemical B": 2}}}},
+			"Dragon Tail": {rarity: 66, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical G": 6, "Chemical Y": 3, "Chemical P": 4}}}},
+			"Slime": {rarity: 76, recipes: {chemicalCombine: {count: 4, ingredients: {"Chemical G": 15, "Chemical B": 4, "Chemical P": 2}}}},
+			"Glowing Nose": {rarity: 50, recipes: {availableDuringEvent: "Winterfest", chemicalCombine: {count: 1, ingredients: {"Chemical R": 10, "Chemical Y": 12, "Chemical B": 4}}}},
+			"Lab Coat": {rarity: 75, recipes: {fromStorePack: "Mad Science Kit", chemicalCombine: {count: 1, ingredients: {"Chemical R": 10, "Chemical Y": 3, "Chemical P": 3}}}},
+			"Ze Goggles": {rarity: 85, recipes: {fromStorePack: "Mad Science Kit", chemicalCombine: {count: 1, ingredients: {"Chemical R": 4, "Chemical B": 2, "Chemical P": 3}}}},
+			"Forcefield": {rarity: 101, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical G": 20, "Chemical R": 10, "Mysterious Chemical": 1}}, fromStorePack: "Astro Pack"}},
+			// "": {rarity: 0, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical G": 0, "Chemical Y": 0, "Mysterious Chemical": 0}}}},
+			"Fuel Pack": {rarity: 116, recipes: {chemicalCombine: {count: 5, ingredients: {"Chemical G": 10, "Chemical B": 2, "Mysterious Chemical": 1}}}},
+			"Battle Trout": {rarity: 141, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical G": 20, "Chemical P": 15, "Mysterious Chemical": 10}}}},
+			"Sassy Boots": {rarity: 115, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical R": 8, "Chemical Y": 4, "Mysterious Chemical": 1}}}},
+			// "": {rarity: 0, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical R": 0, "Chemical B": 0, "Mysterious Chemical": 0}}}},
+			"Block Glue": {recipes: {chemicalCombine: {count: 2, ingredients: {"Chemical R": 1, "Chemical P": 1, "Mysterious Chemical": 1}}}},
+			"Enhanced Intellect": {rarity: 130, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical Y": 3, "Chemical B": 3, "Mysterious Chemical": 3}}}},
+			"Thingamajig": {rarity: 155, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical Y": 4, "Chemical P": 3, "Mysterious Chemical": 1}}}},
+			"Reanimator Remote": {rarity: 200, recipes: {chemicalCombine: {count: 1, ingredients: {"Chemical B": 200, "Chemical P": 200, "Mysterious Chemical": 200}}}},
 
 			// Geiger Counter items
-			"D Battery": {geigerReward: "Geiger Counter"},
-			"Blue Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
-			"Green Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
-			"Red Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
-			"White Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
-			"Black Crystal": {rarity: 100, geigerReward: "Geiger Counter"},
-			"Orange Stuff": {rarity: 31, geigerReward: "Geiger Counter", splice: ["Orange Block", "Coral"]},
-			"Purple Stuff": {rarity: 41, geigerReward: "Geiger Counter", splice: ["Purple Block", "Coral"]},
-			"Blue Stuff": {rarity: 36, geigerReward: "Geiger Counter"},
-			"Green Stuff": {rarity: 36, geigerReward: "Geiger Counter"},
-			"Shield Fragment": {geigerReward: "Geiger Counter", fishing: {minBait: "???"}},
-			"Nuclear Fuel": {geigerReward: "Geiger Counter"},
-			"Tree Decorations": {geigerReward: "Geiger Counter", availableDuringEvent: "Winterfest"},
-			"Glowstick": {geigerReward: "Geiger Counter"},
-			"Ruby Shard": {geigerReward: "Geiger Counter", availableDuringEvent: "Valentine's Week"},
+			"D Battery": {recipes: {geigerReward: "Geiger Counter"}},
+			"Blue Crystal": {rarity: 100, recipes: {geigerReward: "Geiger Counter"}},
+			"Green Crystal": {rarity: 100, recipes: {geigerReward: "Geiger Counter"}},
+			"Red Crystal": {rarity: 100, recipes: {geigerReward: "Geiger Counter"}},
+			"White Crystal": {rarity: 100, recipes: {geigerReward: "Geiger Counter"}},
+			"Black Crystal": {rarity: 100, recipes: {geigerReward: "Geiger Counter"}},
+			"Orange Stuff": {rarity: 31, recipes: {geigerReward: "Geiger Counter", splice: ["Orange Block", "Coral"]}},
+			"Purple Stuff": {rarity: 41, recipes: {geigerReward: "Geiger Counter", splice: ["Purple Block", "Coral"]}},
+			"Blue Stuff": {rarity: 36, recipes: {geigerReward: "Geiger Counter"}},
+			"Green Stuff": {rarity: 36, recipes: {geigerReward: "Geiger Counter"}},
+			"Shield Fragment": {recipes: {geigerReward: "Geiger Counter", fishing: {minBait: "???"}}},
+			"Nuclear Fuel": {recipes: {geigerReward: "Geiger Counter"}},
+			"Tree Decorations": {recipes: {geigerReward: "Geiger Counter", availableDuringEvent: "Winterfest"}},
+			"Glowstick": {recipes: {geigerReward: "Geiger Counter"}},
+			"Ruby Shard": {recipes: {geigerReward: "Geiger Counter", availableDuringEvent: "Valentine's Week"}},
 
 			// Easter Week items
-			"Magic Egg": {rarity: 1, spawnsDuringEvent: "Easter Week"},
-			"Bunny Ears": {rarity: 16, splice: ["Magic Egg", "Polka Dot Block"]},
-			"Bunny Mask": {rarity: 8, splice: ["Magic Egg", "Flowery Wallpaper"]},
-			"Bunny Tail": {rarity: 10, splice: ["Magic Egg", "Bush"]},
-			"Wicker Basket": {rarity: 16, splice: ["Magic Egg", "Lattice Background"]},
-			"Pastel Suit": {rarity: 11, splice: ["Magic Egg", "Painting: Dink Duck"]},
-			"Pastel Pants": {rarity: 4, splice: ["Magic Egg", "Daisy"]},
-			"Hippie Sandals": {rarity: 23, splice: ["Magic Egg", "Wall Like An Egyptian"]},
-			"Rotten Egg": {rarity: 6, splice: ["Magic Egg", "Evil Bricks"]},
-			"Cuddly Bunny": {rarity: 41, splice: ["Magic Egg", "Fishbowl"]},
-			"Psychotic Bunny": {rarity: 41, splice: ["Magic Egg", "Fishbowl"]},
-			"Pastel Aqua Block": {rarity: 6, splice: ["Magic Egg", "Aqua Block"]},
-			"Pastel Blue Block": {rarity: 16, splice: ["Magic Egg", "Blue Block"]},
-			"Pastel Green Block": {rarity: 6, splice: ["Magic Egg", "Green Block"]},
-			"Pastel Orange Block": {rarity: 10, splice: ["Magic Egg", "Orange Block"]},
-			"Pastel Pink Block": {rarity: 5, splice: ["Magic Egg", "Red Block"]},
-			"Pastel Purple Block": {rarity: 20, splice: ["Magic Egg", "Purple Block"]},
-			"Pastel Yellow Block": {rarity: 7, splice: ["Magic Egg", "Yellow Block"]},
-			"Pastel Aqua Flower Block": {rarity: 7, splice: ["Magic Egg", "Pastel Aqua Block"]},
-			"Pastel Blue Flower Block": {rarity: 17, splice: ["Magic Egg", "Pastel Blue Block"]},
-			"Pastel Green Flower Block": {rarity: 7, splice: ["Magic Egg", "Pastel Green Block"]},
-			"Pastel Orange Flower Block": {rarity: 11, splice: ["Magic Egg", "Pastel Orange Block"]},
-			"Pastel Pink Flower Block": {rarity: 6, splice: ["Magic Egg", "Pastel Pink Block"]},
-			"Pastel Purple Flower Block": {rarity: 21, splice: ["Magic Egg", "Pastel Purple Block"]},
-			"Pastel Yellow Flower Block": {rarity: 8, splice: ["Magic Egg", "Pastel Yellow Block"]},
-			"Easter Bonnet": {breakBunnyEgg: {min: 40, max: 49}},
-			"Egg-Hunting Basket": {breakBunnyEgg: {min: 80, max: 89}},
-			"Bubble Wings": {breakBunnyEgg: {min: 90, max: 99}},
-			"Pet Bunny": {breakBunnyEgg: {min: 100, max: 100}},
-			"Easter Egg - Polka Dots": {geigerReward: "Egg-Hunting Basket"},
-			"Easter Egg - Jagged": {geigerReward: "Egg-Hunting Basket"},
-			"Easter Egg - Wavey": {geigerReward: "Egg-Hunting Basket"},
-			"Easter Egg - Checkered": {geigerReward: "Egg-Hunting Basket"},
-			"Easter Egg - Striped": {geigerReward: "Egg-Hunting Basket"},
-			"Easter Egg - Rainbow": {geigerReward: "Egg-Hunting Basket"},
-			"Pastel Pink Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 1}}},
-			"Pastel Orange Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Wavey": 1}}},
-			"Pastel Yellow Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Checkered": 1}}},
-			"Pastel Green Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Wavey": 1}}},
-			"Pastel Aqua Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}},
-			"Pastel Blue Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Wavey": 1, "Easter Egg - Checkered": 1}}},
-			"Pastel Purple Wallpaper": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Polka Dots": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}},
-			"Chocolate Block": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Wavey": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}},
-			"Dark Chocolate Block": {rarity: 50, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1, "Easter Egg - Rainbow": 1}}},
-			"Bouncy Bunny": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Checkered": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 1}}},
-			"Happy Flower Grass": {rarity: 20, chemicalCombine: {count: 1, ingredients: {"Easter Egg - Checkered": 1, "Easter Egg - Wavey": 1, "Easter Egg - Polka Dots": 1}}},
-			"Cursed Jet Engine": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Jagged": 1, "Easter Egg - Wavey": 1, "Easter Egg - Rainbow": 1}}},
-			"Egghead": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Jagged": 1, "Easter Egg - Striped": 1}}},
-			"Marshmallow Basket": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 6}}},
-			"Baby Bunny": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Wavey": 10, "Easter Egg - Checkered": 10, "Easter Egg - Polka Rainbow": 10}}},
-			"Crimefighter Mask - Pink": {villainDrop: "Bunny Barko"},
-			"Muscle Shirt - Pink": {villainDrop: "Bunny Barko"},
-			"Super Tights - Pink": {villainDrop: "Bunny Barko"},
-			"Super Cape - Pink": {villainDrop: "Bunny Barko"},
-			"Super Logo - Bunny": {villainDrop: "Bunny Barko"},
-			"Dark Bunny Mask": {villainDrop: "Bunny Barko"},
-			"Villain Portrait - Bunny Barko": {villainDrop: "Bunny Barko"},
-			"Riding Bumblebee": {store: {availableDuringEvent: "Easter Week", cost: 150000}},
-			"Spring Crown": {rarity: 52, splice: ["Magic Egg", "Golden Halo"]},
-			"Spring Bouquet": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Checkered": 1, "Easter Egg - Striped": 1}}},
-			"Brainflower": {dailyChallengeReward: {challenge: "Bunny Battle", places: "all"}},
-			"Weather Machine - Spring": {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1}}},
-			"Totally Legit Bunnyfish": {fishing: {minBait: "Catch-of-the-Day Bait"}, availableDuringEvent: "Easter Week"},
+			"Magic Egg": {rarity: 1, recipes: {spawnsDuringEvent: "Easter Week"}},
+			"Bunny Ears": {rarity: 16, recipes: {splice: ["Magic Egg", "Polka Dot Block"]}},
+			"Bunny Mask": {rarity: 8, recipes: {splice: ["Magic Egg", "Flowery Wallpaper"]}},
+			"Bunny Tail": {rarity: 10, recipes: {splice: ["Magic Egg", "Bush"]}},
+			"Wicker Basket": {rarity: 16, recipes: {splice: ["Magic Egg", "Lattice Background"]}},
+			"Pastel Suit": {rarity: 11, recipes: {splice: ["Magic Egg", "Painting: Dink Duck"]}},
+			"Pastel Pants": {rarity: 4, recipes: {splice: ["Magic Egg", "Daisy"]}},
+			"Hippie Sandals": {rarity: 23, recipes: {splice: ["Magic Egg", "Wall Like An Egyptian"]}},
+			"Rotten Egg": {rarity: 6, recipes: {splice: ["Magic Egg", "Evil Bricks"]}},
+			"Cuddly Bunny": {rarity: 41, recipes: {splice: ["Magic Egg", "Fishbowl"]}},
+			"Psychotic Bunny": {rarity: 41, recipes: {splice: ["Magic Egg", "Fishbowl"]}},
+			"Pastel Aqua Block": {rarity: 6, recipes: {splice: ["Magic Egg", "Aqua Block"]}},
+			"Pastel Blue Block": {rarity: 16, recipes: {splice: ["Magic Egg", "Blue Block"]}},
+			"Pastel Green Block": {rarity: 6, recipes: {splice: ["Magic Egg", "Green Block"]}},
+			"Pastel Orange Block": {rarity: 10, recipes: {splice: ["Magic Egg", "Orange Block"]}},
+			"Pastel Pink Block": {rarity: 5, recipes: {splice: ["Magic Egg", "Red Block"]}},
+			"Pastel Purple Block": {rarity: 20, recipes: {splice: ["Magic Egg", "Purple Block"]}},
+			"Pastel Yellow Block": {rarity: 7, recipes: {splice: ["Magic Egg", "Yellow Block"]}},
+			"Pastel Aqua Flower Block": {rarity: 7, recipes: {splice: ["Magic Egg", "Pastel Aqua Block"]}},
+			"Pastel Blue Flower Block": {rarity: 17, recipes: {splice: ["Magic Egg", "Pastel Blue Block"]}},
+			"Pastel Green Flower Block": {rarity: 7, recipes: {splice: ["Magic Egg", "Pastel Green Block"]}},
+			"Pastel Orange Flower Block": {rarity: 11, recipes: {splice: ["Magic Egg", "Pastel Orange Block"]}},
+			"Pastel Pink Flower Block": {rarity: 6, recipes: {splice: ["Magic Egg", "Pastel Pink Block"]}},
+			"Pastel Purple Flower Block": {rarity: 21, recipes: {splice: ["Magic Egg", "Pastel Purple Block"]}},
+			"Pastel Yellow Flower Block": {rarity: 8, recipes: {splice: ["Magic Egg", "Pastel Yellow Block"]}},
+			"Easter Bonnet": {recipes: {breakBunnyEgg: {min: 40, max: 49}}},
+			"Egg-Hunting Basket": {recipes: {breakBunnyEgg: {min: 80, max: 89}}},
+			"Bubble Wings": {recipes: {breakBunnyEgg: {min: 90, max: 99}}},
+			"Pet Bunny": {recipes: {breakBunnyEgg: {min: 100, max: 100}}},
+			"Easter Egg - Polka Dots": {recipes: {geigerReward: "Egg-Hunting Basket"}},
+			"Easter Egg - Jagged": {recipes: {geigerReward: "Egg-Hunting Basket"}},
+			"Easter Egg - Wavey": {recipes: {geigerReward: "Egg-Hunting Basket"}},
+			"Easter Egg - Checkered": {recipes: {geigerReward: "Egg-Hunting Basket"}},
+			"Easter Egg - Striped": {recipes: {geigerReward: "Egg-Hunting Basket"}},
+			"Easter Egg - Rainbow": {recipes: {geigerReward: "Egg-Hunting Basket"}},
+			"Pastel Pink Wallpaper": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 1}}}},
+			"Pastel Orange Wallpaper": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Wavey": 1}}}},
+			"Pastel Yellow Wallpaper": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Checkered": 1}}}},
+			"Pastel Green Wallpaper": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Wavey": 1}}}},
+			"Pastel Aqua Wallpaper": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}}},
+			"Pastel Blue Wallpaper": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Striped": 1, "Easter Egg - Wavey": 1, "Easter Egg - Checkered": 1}}}},
+			"Pastel Purple Wallpaper": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Polka Dots": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}}},
+			"Chocolate Block": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Wavey": 1, "Easter Egg - Jagged": 1, "Easter Egg - Checkered": 1}}}},
+			"Dark Chocolate Block": {rarity: 50, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1, "Easter Egg - Rainbow": 1}}}},
+			"Bouncy Bunny": {recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Checkered": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 1}}}},
+			"Happy Flower Grass": {rarity: 20, recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Checkered": 1, "Easter Egg - Wavey": 1, "Easter Egg - Polka Dots": 1}}}},
+			"Cursed Jet Engine": {recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Jagged": 1, "Easter Egg - Wavey": 1, "Easter Egg - Rainbow": 1}}}},
+			"Egghead": {recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Jagged": 1, "Easter Egg - Striped": 1}}}},
+			"Marshmallow Basket": {recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Jagged": 1, "Easter Egg - Polka Dots": 6}}}},
+			"Baby Bunny": {recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Wavey": 10, "Easter Egg - Checkered": 10, "Easter Egg - Polka Rainbow": 10}}}},
+			"Crimefighter Mask - Pink": {recipes: {villainDrop: "Bunny Barko"}},
+			"Muscle Shirt - Pink": {recipes: {villainDrop: "Bunny Barko"}},
+			"Super Tights - Pink": {recipes: {villainDrop: "Bunny Barko"}},
+			"Super Cape - Pink": {recipes: {villainDrop: "Bunny Barko"}},
+			"Super Logo - Bunny": {recipes: {villainDrop: "Bunny Barko"}},
+			"Dark Bunny Mask": {recipes: {villainDrop: "Bunny Barko"}},
+			"Villain Portrait - Bunny Barko": {recipes: {villainDrop: "Bunny Barko"}},
+			"Riding Bumblebee": {recipes: {store: {availableDuringEvent: "Easter Week", cost: 150000}}},
+			"Spring Crown": {rarity: 52, recipes: {splice: ["Magic Egg", "Golden Halo"]}},
+			"Spring Bouquet": {recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Checkered": 1, "Easter Egg - Striped": 1}}}},
+			"Brainflower": {recipes: {dailyChallengeReward: {challenge: "Bunny Battle", places: "all"}}},
+			"Weather Machine - Spring": {recipes: {chemicalCombine: {count: 1, ingredients: {"Easter Egg - Rainbow": 1, "Easter Egg - Polka Dots": 1, "Easter Egg - Striped": 1}}}},
+			"Totally Legit Bunnyfish": {recipes: {fishing: {minBait: "Catch-of-the-Day Bait"}, availableDuringEvent: "Easter Week"}},
 			
 			// Item of the Month
-			"Golden Razor Wings": {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}},
+			"Golden Razor Wings": {recipes: {itemOfTheMonth: {month: "March", year: 2017, cost: 100000}}},
 
 			// Weather Machines
-			"Weather Machine - Sunny": {store: {section: "Weather Machines", cost: 1000}},
-			"Weather Machine - Night": {store: {section: "Weather Machines", cost: 10000}},
-			"Weather Machine - Arid": {store: {section: "Weather Machines", cost: 10000}},
-			"Weather Machine - Rainy City": {store: {section: "Weather Machines", cost: 10000}},
-			"Weather Machine - Warp Speed": {store: {section: "Weather Machines", cost: 10000}},
-			"Mars Blast": {store: {section: "Weather Machines", cost: 15000}},
-			"Thermonuclear Blast": {store: {section: "Weather Machines", cost: 15000}},
-			"Undersea Blast": {store: {section: "Weather Machines", cost: 15000}},
-			"Cave Blast": {store: {section: "Weather Machines", cost: 30000}},
-			"Weather Machine - Stuff": {store: {section: "Weather Machines", cost: 50000}},
+			"Weather Machine - Sunny": {recipes: {store: {section: "Weather Machines", cost: 1000}}},
+			"Weather Machine - Night": {recipes: {store: {section: "Weather Machines", cost: 10000}}},
+			"Weather Machine - Arid": {recipes: {store: {section: "Weather Machines", cost: 10000}}},
+			"Weather Machine - Rainy City": {recipes: {store: {section: "Weather Machines", cost: 10000}}},
+			"Weather Machine - Warp Speed": {recipes: {store: {section: "Weather Machines", cost: 10000}}},
+			"Mars Blast": {recipes: {store: {section: "Weather Machines", cost: 15000}}},
+			"Thermonuclear Blast": {recipes: {store: {section: "Weather Machines", cost: 15000}}},
+			"Undersea Blast": {recipes: {store: {section: "Weather Machines", cost: 15000}}},
+			"Cave Blast": {recipes: {store: {section: "Weather Machines", cost: 30000}}},
+			"Weather Machine - Stuff": {recipes: {store: {section: "Weather Machines", cost: 50000}}},
 
 			//St. Patrick's Pack
-			"Orange Beard": {fromStorePack: "St. Patrick's Pack"},
-			"Leprechaun Suit": {fromStorePack: "St. Patrick's Pack"},
-			"Leprechaun Shoes": {fromStorePack: "St. Patrick's Pack"},
-			"Green Pants": {fromStorePack: "St. Patrick's Pack"},
-			"Leprechaun Hat": {fromStorePack: "St. Patrick's Pack"},
-			"Pot O' Gold": {fromStorePack: "St. Patrick's Pack"},
-			"Green Beer": {fromStorePack: "St. Patrick's Pack"},
+			"Orange Beard": {recipes: {fromStorePack: "St. Patrick's Pack"}},
+			"Leprechaun Suit": {recipes: {fromStorePack: "St. Patrick's Pack"}},
+			"Leprechaun Shoes": {recipes: {fromStorePack: "St. Patrick's Pack"}},
+			"Green Pants": {recipes: {fromStorePack: "St. Patrick's Pack"}},
+			"Leprechaun Hat": {recipes: {fromStorePack: "St. Patrick's Pack"}},
+			"Pot O' Gold": {recipes: {fromStorePack: "St. Patrick's Pack"}},
+			"Green Beer": {recipes: {fromStorePack: "St. Patrick's Pack"}},
 			//Chemsynth Pack
-    		"Chemsynth Processor": {fromStorePack: "Chemsynth Pack"},
-    		"Chemsynth Tank": {fromStorePack: "Chemsynth Pack"},
-    		"Chemsynth Replicator": {fromStorePack: "Chemsynth Pack"},
-    		"Chemsynth Catalyst": {fromStorePack: "Chemsynth Pack"},
-    		"Chemsynth Solvent": {fromStorePack: "Chemsynth Pack"},
-    		"Chemsynth Centrifuge": {fromStorePack: "Chemsynth Pack"},
-    		"Chemsynth Stirrer": {fromStorePack: "Chemsynth Pack"},
+    		"Chemsynth Processor": {recipes: {fromStorePack: "Chemsynth Pack"}},
+    		"Chemsynth Tank": {recipes: {fromStorePack: "Chemsynth Pack"}},
+    		"Chemsynth Replicator": {recipes: {fromStorePack: "Chemsynth Pack"}},
+    		"Chemsynth Catalyst": {recipes: {fromStorePack: "Chemsynth Pack"}},
+    		"Chemsynth Solvent": {recipes: {fromStorePack: "Chemsynth Pack"}},
+    		"Chemsynth Centrifuge": {recipes: {fromStorePack: "Chemsynth Pack"}},
+    		"Chemsynth Stirrer": {recipes: {fromStorePack: "Chemsynth Pack"}},
 
     		// "Awesome Items"
-			"Turtle Hat": {store: {section: "Awesome Items", cost: 25000}},
-			"Tiny Horsie": {store: {section: "Awesome Items", cost: 25000}},
-			"Pleiadian Star Ship": {store: {section: "Awesome Items", cost: 25000}},
-			"Dragon Hand": {store: {section: "Awesome Items", cost: 50000}},
-			"Little Red Corvette": {store: {section: "Awesome Items", cost: 25000}},
-			"Stick Horse": {store: {section: "Awesome Items", cost: 25000}},
-			"Ambulance": {store: {section: "Awesome Items", cost: 25000}},
-			"Riding Raptor": {store: {section: "Awesome Items", cost: 25000}},
-			"Mid-Pacific Owl": {store: {section: "Awesome Items", cost: 30000}},
-			"Unicorn Garland": {store: {section: "Awesome Items", cost: 50000}},
-			"Starboard": {store: {section: "Awesome Items", cost: 30000}},
-			"Growley Motorcycle": {store: {section: "Awesome Items", cost: 50000}},
-			"Geiger Counter": {store: {section: "Awesome Items", cost: 25000}},
-			"Monkey On Your Back": {store: {section: "Awesome Items", cost: 50000}},
-			"Carrot Sword": {store: {section: "Awesome Items", cost: 15000}},
-			"Red Bicycle": {store: {section: "Awesome Items", cost: 30000}},
-			"Fire Truck": {store: {section: "Awesome Items", cost: 50000}},
-			"Pet Slime": {store: {section: "Awesome Items", cost: 100000}},
-			"Silkworm": {store: {section: "Awesome Items", cost: 7000}},
+			"Turtle Hat": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Tiny Horsie": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Pleiadian Star Ship": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Dragon Hand": {recipes: {store: {section: "Awesome Items", cost: 50000}}},
+			"Little Red Corvette": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Stick Horse": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Ambulance": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Riding Raptor": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Mid-Pacific Owl": {recipes: {store: {section: "Awesome Items", cost: 30000}}},
+			"Unicorn Garland": {recipes: {store: {section: "Awesome Items", cost: 50000}}},
+			"Starboard": {recipes: {store: {section: "Awesome Items", cost: 30000}}},
+			"Growley Motorcycle": {recipes: {store: {section: "Awesome Items", cost: 50000}}},
+			"Geiger Counter": {recipes: {store: {section: "Awesome Items", cost: 25000}}},
+			"Monkey On Your Back": {recipes: {store: {section: "Awesome Items", cost: 50000}}},
+			"Carrot Sword": {recipes: {store: {section: "Awesome Items", cost: 15000}}},
+			"Red Bicycle": {recipes: {store: {section: "Awesome Items", cost: 30000}}},
+			"Fire Truck": {recipes: {store: {section: "Awesome Items", cost: 50000}}},
+			"Pet Slime": {recipes: {store: {section: "Awesome Items", cost: 100000}}},
+			"Silkworm": {recipes: {store: {section: "Awesome Items", cost: 7000}}},
 
 			// "Locks And Stuff"
-			"Small Lock": {store: {section: "Locks And Stuff", cost: 50}},
-			"Big Lock": {store: {section: "Locks And Stuff", cost: 200}},
-			"Huge Lock": {store: {section: "Locks And Stuff", cost: 500}},
-			"World Lock": {store: {section: "Locks And Stuff", cost: 2000}},
-			"Grow Spray Fertilizer": {store: {section: "Locks And Stuff", cost: 200}},
-			"Deluxe Grow Spray": {store: {section: "Locks And Stuff", cost: 900}},
-			"Signal Jammer": {store: {section: "Locks And Stuff", cost: 2000}},
-			"Zombie Jammer": {store: {section: "Locks And Stuff", cost: 15000}},
-			"Punch Jammer": {store: {section: "Locks And Stuff", cost: 15000}},
-			"Birth Certificate": {store: {section: "Locks And Stuff", cost: 20000}},
-			"Change of Address": {store: {section: "Locks And Stuff", cost: 20000}},
-			"Door Mover": {store: {section: "Locks And Stuff", cost: 5000}},
-			"Vending Machine": {store: {section: "Locks And Stuff", cost: 8000}},
+			"Small Lock": {recipes: {store: {section: "Locks And Stuff", cost: 50}}},
+			"Big Lock": {recipes: {store: {section: "Locks And Stuff", cost: 200}}},
+			"Huge Lock": {recipes: {store: {section: "Locks And Stuff", cost: 500}}},
+			"World Lock": {recipes: {store: {section: "Locks And Stuff", cost: 2000}}},
+			"Grow Spray Fertilizer": {recipes: {store: {section: "Locks And Stuff", cost: 200}}},
+			"Deluxe Grow Spray": {recipes: {store: {section: "Locks And Stuff", cost: 900}}},
+			"Signal Jammer": {recipes: {store: {section: "Locks And Stuff", cost: 2000}}},
+			"Zombie Jammer": {recipes: {store: {section: "Locks And Stuff", cost: 15000}}},
+			"Punch Jammer": {recipes: {store: {section: "Locks And Stuff", cost: 15000}}},
+			"Birth Certificate": {recipes: {store: {section: "Locks And Stuff", cost: 20000}}},
+			"Change of Address": {recipes: {store: {section: "Locks And Stuff", cost: 20000}}},
+			"Door Mover": {recipes: {store: {section: "Locks And Stuff", cost: 5000}}},
+			"Vending Machine": {recipes: {store: {section: "Locks And Stuff", cost: 8000}}},
 
 			// Growtokens
-			"Challenge Timer": {tokenStore: 5},
-			"Experience Potion": {tokenStore: 10},
-			"Megaphone": {tokenStore: 10, fromGemsPack: {name: "It's Rainin' Gems", count: 1}},
-			"Derpy Star Block": {tokenStore: 30},
-			"BLYoshi's Free Dirt": {tokenStore: 40},
-			"Nothingness": {tokenStore: 50},
-			"Spike Juice": {tokenStore: 60},
-			"Doodad": {tokenStore: 75},
-			"Crystal Cape": {tokenStore: 90},
-			"Focused Eyes": {tokenStore: 100},
-			"Grip Tape": {tokenStore: 100},
-			"Night Vision Goggles": {tokenStore: 110},
-			"Muddy Pants": {tokenStore: 125},
-			"Cuddly Piranha": {tokenStore: 150},
-			"Puddy Leash": {tokenStore: 180},
-			"Golden Pickaxe": {tokenStore: 200},
-			"Puppy Leash": {tokenStore: 200},
-			"Digger's Spade": {tokenStore: 200},
+			"Challenge Timer": {recipes: {tokenStore: 5}},
+			"Experience Potion": {recipes: {tokenStore: 10}},
+			"Megaphone": {recipes: {tokenStore: 10, fromGemsPack: {name: "It's Rainin' Gems", count: 1}}},
+			"Derpy Star Block": {recipes: {tokenStore: 30}},
+			"BLYoshi's Free Dirt": {recipes: {tokenStore: 40}},
+			"Nothingness": {recipes: {tokenStore: 50}},
+			"Spike Juice": {recipes: {tokenStore: 60}},
+			"Doodad": {recipes: {tokenStore: 75}},
+			"Crystal Cape": {recipes: {tokenStore: 90}},
+			"Focused Eyes": {recipes: {tokenStore: 100}},
+			"Grip Tape": {recipes: {tokenStore: 100}},
+			"Night Vision Goggles": {recipes: {tokenStore: 110}},
+			"Muddy Pants": {recipes: {tokenStore: 125}},
+			"Cuddly Piranha": {recipes: {tokenStore: 150}},
+			"Puddy Leash": {recipes: {tokenStore: 180}},
+			"Golden Pickaxe": {recipes: {tokenStore: 200}},
+			"Puppy Leash": {recipes: {tokenStore: 200}},
+			"Digger's Spade": {recipes: {tokenStore: 200}},
 
 			// Special Prizes
-			"Growie Award": {competitionPrize: "Video of the Week", competitionURL: "https://www.growtopiagame.com/forums/showthread.php?77092-Nominate-Youtube-videos-for-Growies-here!"},
-			"Ultra Trophy 3000": {competitionPrize: "World of the Day", competitionURL: "https://www.growtopiagame.com/forums/showthread.php?353202-Is-your-world-good-enough-to-be-a-World-Of-The-Day-!"},
+			"Growie Award": {recipes: {competition: {name: "Video of the Week", url: "https://www.growtopiagame.com/forums/showthread.php?77092-Nominate-Youtube-videos-for-Growies-here!"}}},
+			"Ultra Trophy 3000": {recipes: {competition: {name: "World of the Day", url: "https://www.growtopiagame.com/forums/showthread.php?353202-Is-your-world-good-enough-to-be-a-World-Of-The-Day-!"}}},
 		};
 		var missingItemNames = [];
 
@@ -1445,142 +1588,20 @@
 				var source = document.createElement("p");
 				var sourceInfo = [];
 
-				if (item.availableDuringEvent) {
-					sourceInfo.push("<em>This item can only be created during " + item.availableDuringEvent + ".</em>");
-				}
-				if (item.splice) {
-					var parent1 = items[item.splice[0]];
-					var parent2 = items[item.splice[1]];
-					// Check splicing parent names
-					if (!parent1) {
-						error("Item", itemName, "parent item not found: ", item.splice[0]);
-						missingItemNames.push(item.splice[0]);
-					}
-					if (!parent2) {
-						error("Item", itemName, "parent item not found: ", item.splice[1]);
-						missingItemNames.push(item.splice[1]);
-					}
-
-					// Check the rarities match!
-					if (parent1 && parent2) {
-						var targetRarity = parent1.rarity + parent2.rarity;
-						if (item.rarity != targetRarity) {
-							error("Rarities don't match up for item", itemName, "was", item.rarity, "sum of parents is", targetRarity);
-						}
-					}
-
-					sourceInfo.push("Splice a "
-					+ "<a href=\"#" + makeItemLinkID(item.splice[0]) + "\">" + item.splice[0] + "</a> seed with a "
-					+ "<a href=\"#" + makeItemLinkID(item.splice[1]) + "\">" + item.splice[1] + "</a> seed.");
-				}
-				if (item.chemicalCombine) {
-					var c = item.chemicalCombine;
-					var ingredients = Object.keys(c.ingredients);
-					sourceInfo.push("Make " + c.count + " by combining "
-						+ c.ingredients[ingredients[0]] + " <a href=\"#" + makeItemLinkID(ingredients[0]) + "\">" + ingredients[0] + "</a>, "
-						+ c.ingredients[ingredients[1]] + " <a href=\"#" + makeItemLinkID(ingredients[1]) + "\">" + ingredients[1] + "</a> and "
-						+ c.ingredients[ingredients[2]] + " <a href=\"#" + makeItemLinkID(ingredients[2]) + "\">" + ingredients[2] + "</a> "
-						+ "in any Chemical Combiner.");
-				}
-				if (item.spawnsInWorlds) {
-					if (item.spawnsInWorlds.length == 1 && item.spawnsInWorlds[0] == "normal") {
-						sourceInfo.push("Spawns naturally in new worlds.");
-					} else {
-						var siw = item.spawnsInWorlds;
-						if (siw.includes("normal")) {
-							siw.splice(siw.indexOf("normal"), 1);
-							siw = makeItemLinks(siw);
-							siw.unshift("normal");
+				if (!item.hasOwnProperty("recipes")) {
+					error("Missing 'recipes' data for item", itemName);
+				} else {
+					var recipeNames = Object.keys(item.recipes);
+					for (var recipeIndex in recipeNames) {
+						var recipe = recipeNames[recipeIndex];
+						if (recipeTypes.hasOwnProperty(recipe)) {
+							sourceInfo.push(recipeTypes[recipe](itemName, item.recipes[recipe]));
 						} else {
-							siw = makeItemLinks(siw);
-						}
-						sourceInfo.push("Spawns naturally in new " + andJoin(siw, "and") + " worlds.");
-					}
-				}
-				if (item.spawnsDuringEvent) {
-					sourceInfo.push("Spawns in active worlds during " + item.spawnsDuringEvent + ".");
-				}
-				if (item.specialEventSpawn) {
-					sourceInfo.push("Spawns in the '" + item.specialEventSpawn + "' special event.");
-				}
-				if (item.geigerReward) {
-					sourceInfo.push("Can be found when using a <a href=\"#" + makeItemLinkID(item.geigerReward) + "\">" + item.geigerReward + "</a>.");
-				}
-				if (item.villainDrop) {
-					sourceInfo.push("Is a possible reward for defeating " + item.villainDrop + " in a card battle.");
-				}
-				if (item.fishing) {
-					var f = item.fishing;
-					sourceInfo.push("Is a fish you can catch using <a href=\"#" + makeItemLinkID(f.minBait) + "\">" + f.minBait + "</a> or better.");
-				}
-				if (item.fromGemsPack) {
-					sourceInfo.push("Get " + item.fromGemsPack.count + " when buying the " + item.fromGemsPack.name + " package from the Store.");
-				}
-				if (item.fromStorePack) {
-					if (!packs.hasOwnProperty(item.fromStorePack)) {
-						error("Item ", itemName, " refers to missing store pack \"", item.fromStorePack, "\"");
-					} else {
-						var pack = packs[item.fromStorePack];
-						if (!pack) {
-							error("Item ", itemName, " says it's in the store pack \"", item.fromStorePack, "\", which doesn't exist!");
-						} else if (!packHasItem(pack, itemName)) {
-							error("Item ", itemName, " says it's in the store pack \"", item.fromStorePack, "\", which doesn't include it.");
-						} else {
-							if (pack.items && pack.items.hasOwnProperty(itemName)) {
-								var itemInPack = pack.items[itemName];
-								var t = "Get " + itemInPack + " when buying the "
-								+ "<a href=\"#" + makePackLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store";
-
-								if (pack.availableDuringEvent) {
-									t += " during " + pack.availableDuringEvent + ".";
-								} else {
-									t += ".";
-								}
-
-								sourceInfo.push(t);
-							} else {
-								// It's a random chance from that pack.
-								sourceInfo.push("Get randomly when buying the "
-								+ "<a href=\"#" + makePackLinkID(item.fromStorePack) + "\">" + item.fromStorePack + "</a> for " + pack.cost + " gems from the Store");
-							}
+							error("Item", itemName, "recipe type not recognised:", recipe);
 						}
 					}
 				}
-				if (item.rareWhenHarvesting) {
-					sourceInfo.push("Is a rare drop when harvesting <a href=\"#" + makeItemLinkID(item.rareWhenHarvesting) + "\">" + item.rareWhenHarvesting + "</a> trees.");
-				}
-				if (item.breakBunnyEgg) {
-					if (item.breakBunnyEgg.min == item.breakBunnyEgg.max) {
-						sourceInfo.push("Obtained by breaking a Bunny Egg at " + item.breakBunnyEgg.min + " size.");
-					} else {
-						sourceInfo.push("Obtained by breaking a Bunny Egg at " + item.breakBunnyEgg.min + " to " + item.breakBunnyEgg.max + " size.");
-					}
-				}
-				if (item.fromGrowganoth) {
-					sourceInfo.push("Get by sacrificing one of the following to Growganoth: " + andJoin(makeItemLinks(item.fromGrowganoth), "or") + ".");
-				}
-				if (item.itemOfTheMonth) {
-					sourceInfo.push("Was the <a href=\"https://growtopiagame.com/itemomonth.php\" target=\"_blank\">Item of the Month</a> in " + item.itemOfTheMonth.month + " " + item.itemOfTheMonth.year + ", available in the Store for " + item.itemOfTheMonth.cost + " gems.");
-				}
-				if (item.store) {
-					sourceInfo.push("Available in the Store for " + item.store.cost + " gems, in the " + item.store.section + " section.");
-				}
-				if (item.tokenStore) {
-					sourceInfo.push("Available in the Store for " + item.tokenStore + " Growtokens.");
-				}
-				if (item.competitionPrize) {
-					sourceInfo.push("Is a prize for winning " + item.competitionPrize
-						+ ". <a href=\"" + item.competitionURL + "\" target=\"_blank\">Enter here</a>");
-				}
-				if (item.dailyChallengeReward) {
-					var dc = item.dailyChallengeReward;
-					switch (dc.places) {
-						case "all": sourceInfo.push("Is a prize for being in the top 3 in the " + dc.challenge + " daily challenge."); break;
-						case 1: sourceInfo.push("Is a prize for getting 1st Place in the " + dc.challenge + " daily challenge."); break;
-						case 2: sourceInfo.push("Is a prize for getting 2nd Place in the " + dc.challenge + " daily challenge."); break;
-						case 3: sourceInfo.push("Is a prize for getting 3rd Place in the " + dc.challenge + " daily challenge."); break;
-					}
-				}
+
 				source.innerHTML = sourceInfo.join("<br/>");
 				infoBox.appendChild(source);
 
